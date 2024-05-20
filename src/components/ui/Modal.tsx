@@ -1,3 +1,4 @@
+
 import { X } from "lucide-react";
 import React, { useRef } from "react";
 
@@ -42,3 +43,4 @@ function Modal({ onClose, open, modalTitle ,children }: ModalProps) {
 }
 
 export default Modal;
+

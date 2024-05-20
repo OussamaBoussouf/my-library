@@ -1,3 +1,4 @@
+
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar/Navbar";
@@ -29,3 +30,4 @@ function App() {
 }
 
 export default App;
+
