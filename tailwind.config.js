@@ -5,7 +5,13 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily:{
+        "roboto-bold": 'Roboto-bold, sans-serif', // Adds a new `font-display` class
+        "roboto-light": 'Roboto-light, sans-serif',
+        "poetsenOne": 'PoetsenOne, sans-serif'
+      }
+    },
   },
   plugins: [],
 }
