@@ -1,8 +1,8 @@
 import React from "react";
-import { cva } from "class-variance-authority";
+import {cva} from "class-variance-authority";
 import { cn } from "../../utils/cn";
 
-type ButtonProps = React.HTMLAttributes<HTMLButtonElement> & {
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary";
 };
 
