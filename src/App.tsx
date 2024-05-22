@@ -3,6 +3,7 @@ import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 function App() {
   const RootLayout = () => {
@@ -14,6 +15,7 @@ function App() {
       </>
     );
   };
+  
   const router = createBrowserRouter([
     {
       path: "/",
@@ -22,7 +24,10 @@ function App() {
         {
           path: "/",
           element: <Home />,
-        },
+        },{
+          path: "/dashboard/:id",
+          element: <Dashboard/>
+        }
       ],
     },
   ]);

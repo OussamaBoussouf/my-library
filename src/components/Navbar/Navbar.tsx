@@ -11,7 +11,7 @@ function Navbar() {
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
 
   return (
-    <nav className="py-2 px-5 bg-gray-100">
+    <nav className="py-2 px-5 bg-gray-100 shadow-lg">
       <div className="max-w-[1200px] flex items-center justify-between mx-auto">
         <div className="flex items-center">
           <img className="rounded-lg me-2" width={46} src={logo} alt="book" />
@@ -32,7 +32,6 @@ function Navbar() {
         <Input type="email" placeholder="Email" />
         <InputPassword
           placeholder="Password"
-          onChange={(e) => console.log(e.target.value)}
         />
         <Button className="w-full">Log In</Button>
         <div className="flex items-center w-full">
@@ -57,7 +56,6 @@ function Navbar() {
         <Input type="email" placeholder="Email" />
         <InputPassword
           placeholder="Password"
-          onChange={(e) => console.log(e.target.value)}
         />
         <Button className="w-full">Sign Up</Button>
       </Modal>

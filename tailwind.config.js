@@ -11,6 +11,9 @@ export default {
         "roboto-light": 'Roboto-light, sans-serif',
         "poetsenOne": 'PoetsenOne, sans-serif'
       },
+      gridTemplateColumns:{
+        "fit": "repeat(auto-fit,minmax(240px, 1fr))"
+      },
       backgroundColor:{
         "transparent-black": 'rgba(0, 0, 0, 0.5)'
       }
