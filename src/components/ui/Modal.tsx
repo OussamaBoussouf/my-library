@@ -6,7 +6,7 @@ type ModalProps = {
   onClose: () => void;
   open: boolean;
   modalTitle: string,
-  children: JSX.Element[]
+  children: React.ReactNode
 };
 
 function Modal({ onClose, open, modalTitle ,children }: ModalProps) {
@@ -23,7 +23,7 @@ function Modal({ onClose, open, modalTitle ,children }: ModalProps) {
       {open ? (
         <div
           ref={ref}
-          className="bg-transparent-black fixed inset-0 grid place-content-center "
+          className="bg-transparent-black fixed z-10 inset-0 grid place-content-center "
           onClick={handleClick}
         >
           <div className="bg-white rounded-lg w-[80vw] max-w-[500px] p-3">
@@ -32,7 +32,7 @@ function Modal({ onClose, open, modalTitle ,children }: ModalProps) {
             </button>
             <h2 className="text-3xl font-poetsenOne text-center pb-2">{modalTitle}</h2>
             <hr />
-            <div className="my-5 text-center mx-auto max-w-[300px] flex flex-col gap-5 items-center">
+            <div className="my-5 text-start mx-auto max-w-[350px] flex flex-col gap-5 items-center">
               {children}
             </div>
           </div>
