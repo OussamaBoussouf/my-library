@@ -13,7 +13,7 @@ function Book({ image }: { image: string }) {
         alt="book cover"
       />
       <p className="text-xl font-poetsenOne my-2">Book Title</p>
-      <Button>Read Book</Button>
+      <Button className="mx-auto">Read Book</Button>
     </div>
   );
 }

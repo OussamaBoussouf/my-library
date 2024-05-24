@@ -1,10 +1,13 @@
 import { Eye, EyeOff } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { forwardRef, useRef, useState } from "react";
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
-function InputPassword({ placeholder, ...props }: InputProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+const InputPassword = forwardRef<HTMLInputElement, InputProps>(function (
+  { placeholder, ...props },
+  ref
+) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -23,7 +26,15 @@ function InputPassword({ placeholder, ...props }: InputProps) {
   return (
     <div className="relative w-full">
       <input
-        ref={inputRef}
+        ref={(node) => {
+          inputRef.current = node;
+          if (typeof ref === "function") {
+            ref(node);
+          } else if (ref) {
+            (ref as React.MutableRefObject<HTMLInputElement | null>).current =
+              node;
+          }
+        }}
         type="password"
         {...props}
         className="bg-gray-300 w-full rounded-md placeholder-black py-2 px-4"
@@ -46,6 +57,6 @@ function InputPassword({ placeholder, ...props }: InputProps) {
       </button>
     </div>
   );
-}
+});
 
 export default InputPassword;

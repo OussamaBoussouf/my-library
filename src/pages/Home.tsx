@@ -11,7 +11,7 @@ function Home() {
           Experience the convenience of reading your PDF books online. Upload
           your files and access them from anywhere with our intuitive platform.
         </p>
-        <Button className="text-xl max-w-fit font-semibold rounded-full text-white bg-indigo-500 hover:bg-indigo-700 px-12 py-4">
+        <Button className="text-xl mx-auto max-w-fit font-semibold rounded-full text-white bg-indigo-500 hover:bg-indigo-700 px-12 py-4">
           Start free with Google
         </Button>
       </div>
