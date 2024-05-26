@@ -1,15 +1,14 @@
-
 import { X } from "lucide-react";
 import React, { useRef } from "react";
 
 type ModalProps = {
   onClose: () => void;
   open: boolean;
-  modalTitle: string,
-  children: React.ReactNode
+  modalTitle: string;
+  children: React.ReactNode;
 };
 
-function Modal({ onClose, open, modalTitle ,children }: ModalProps) {
+function Modal({ onClose, open, modalTitle, children }: ModalProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -30,11 +29,11 @@ function Modal({ onClose, open, modalTitle ,children }: ModalProps) {
             <button onClick={onClose} className="float-end" type="button">
               <X />
             </button>
-            <h2 className="text-3xl font-poetsenOne text-center pb-2">{modalTitle}</h2>
+            <h2 className="text-3xl font-poetsenOne text-center pb-2">
+              {modalTitle}
+            </h2>
             <hr />
-            <div className="my-5 text-start mx-auto max-w-[350px] flex flex-col gap-5 items-center">
-              {children}
-            </div>
+            {children}
           </div>
         </div>
       ) : null}
@@ -43,4 +42,3 @@ function Modal({ onClose, open, modalTitle ,children }: ModalProps) {
 }
 
 export default Modal;
-

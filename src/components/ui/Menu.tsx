@@ -1,12 +1,10 @@
 import {
-  ArchiveRestore,
   EllipsisVertical,
-  Star,
   StarHalf,
   Trash,
 } from "lucide-react";
 import { useClickOutside } from "../../hooks/useClickOutside";
-import { memo, useRef, useState } from "react";
+import { memo, useRef} from "react";
 import { useToggle } from "../../hooks/useToggle";
 
 function Menu() {
