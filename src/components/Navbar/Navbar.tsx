@@ -3,21 +3,10 @@ import logo from "../../assets/img/logo.jpg";
 import Login from "../Login/Login";
 import SignUp from "../SignUp/SignUp";
 import { AuthContext } from "../../context/authContext";
-import Button from "../ui/Button";
-import { auth } from "../../firestore";
-import { signOut } from "firebase/auth";
+import Avatar from "../Avatar/Avatar";
 
 function Navbar() {
   const user = useContext(AuthContext);
-  
-  
-  const logOut = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <nav className="py-2 px-5 bg-gray-100 shadow-lg">
@@ -28,7 +17,7 @@ function Navbar() {
         </div>
         <div className="flex gap-4">
           {user ? (
-            <Button onClick={logOut}> Sign out </Button>
+            <Avatar />
           ) : (
             <>
               <Login />
