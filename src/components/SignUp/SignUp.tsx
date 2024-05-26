@@ -1,4 +1,4 @@
-import { User, createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useToggle } from "../../hooks/useToggle";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
@@ -6,12 +6,12 @@ import InputPassword from "../ui/InputPassword";
 import Modal from "../ui/Modal";
 import { useState } from "react";
 import { auth, db } from "../../firestore";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
+import { signUpSchema } from "../../utils/schemaValidator";
 
 interface UserInfo {
   user_name: string;
@@ -19,13 +19,6 @@ interface UserInfo {
   password: string;
 }
 
-const schema = z.object({
-  user_name: z.string().min(2, { message: "Must be more then 2 characters" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
 
 function SignUp() {
   const { toggle: isSignUpOpen, toggleExpand } = useToggle();
@@ -36,7 +29,7 @@ function SignUp() {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<UserInfo>({ resolver: zodResolver(schema) });
+  } = useForm<UserInfo>({ resolver: zodResolver(signUpSchema) });
 
   const onSubmit: SubmitHandler<UserInfo> = (data) => {
     createUser(data);
@@ -45,26 +38,23 @@ function SignUp() {
   const createUser = async (user: UserInfo) => {
     try {
       setIsLoading(true);
-
       const credential = await createUserWithEmailAndPassword(
         auth,
         user.email,
-        user.password
+        user.password,
       );
+      await updateProfile(credential.user, {displayName: user.user_name})
       const userId = credential.user.uid;
-      const docData = {
-        user_name: user.user_name,
+      const userRecord = {
         email: user.email,
         books: [],
         favorites: [],
         trash: [],
       };
-      await setDoc(doc(db, "users", userId), docData);
+      await setDoc(doc(db, "users", userId), userRecord);
       toast.success("Your account has been created successfully");
       setIsLoading(false);
-      setAuthError("");
       reset();
-      toggleExpand();
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code == "auth/email-already-in-use") {
