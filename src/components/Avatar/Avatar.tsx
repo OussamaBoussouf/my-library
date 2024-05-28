@@ -39,7 +39,7 @@ function Avatar() {
         type="button"
         aria-expanded={true}
         onClick={toggleExpand}
-        className="bg-orange-500 text-white font-bold flex items-center justify-center cursor-pointer w-[40px] h-[40px] rounded-full"
+        className="bg-orange-500  text-white font-bold flex items-center justify-center cursor-pointer w-[40px] h-[40px] rounded-full"
       >
         {user?.name.substring(0, 2).toUpperCase()}
       </button>
