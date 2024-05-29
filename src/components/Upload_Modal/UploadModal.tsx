@@ -8,10 +8,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uploadBookSchema } from "../../utils/schemaValidator";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { auth, db, storage } from "../../firestore";
-import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { db, storage } from "../../firestore";
+import { addDoc, collection} from "firebase/firestore";
 import { generateString } from "../../utils/randomString";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context/authContext";
 
 //INTERFACE
 interface IBook {
@@ -22,9 +23,16 @@ interface IBook {
   category: string;
 }
 
+interface User {
+  uid: string;
+  name: string;
+}
+
 function UploadModal() {
   const { toggle: isOpen, toggleExpand } = useToggle();
   const [loading, setLoading] = useState(false);
+  const user = useContext<User | null>(AuthContext);
+
 
   const {
     register,
@@ -56,23 +64,23 @@ function UploadModal() {
     return getDownloadURL(storageRef);
   };
 
-  const createRecord = (
+  const createRecord = async(
     category: string,
     title: string,
     imageUrl: string,
     pdfUrl: string
   ) => {
-    const id = generateString(10);
-    const bookRef = doc(db, "users", `${auth.currentUser?.uid}`);
-    updateDoc(bookRef, {
-      books: arrayUnion({
-        cateogry: category,
+    const bookRef = collection(db, "users", `${user?.uid}`, "books");
+    try {
+      await addDoc(bookRef, {
         title: title,
-        image: imageUrl,
-        pdf: pdfUrl,
-        id: id,
-      }),
-    });
+        category: category,
+        imageUrl: imageUrl,
+        pdfUrl: pdfUrl 
+      });
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
   };
 
   return (
