@@ -5,7 +5,9 @@ import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard/Dashboard";
 
+
 function App() {
+
   const RootLayout = () => {
     return (
       <>

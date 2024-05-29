@@ -12,7 +12,7 @@ export default {
         "poetsenOne": 'PoetsenOne, sans-serif'
       },
       gridTemplateColumns:{
-        "fit": "repeat(auto-fit,minmax(240px, 1fr))"
+        "fill": "repeat(auto-fill,minmax(240px, 1fr))"
       },
       backgroundColor:{
         "transparent-black": 'rgba(0, 0, 0, 0.5)'

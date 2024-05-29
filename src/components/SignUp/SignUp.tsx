@@ -47,9 +47,7 @@ function SignUp() {
       const userId = credential.user.uid;
       const userRecord = {
         email: user.email,
-        books: [],
-        favorites: [],
-        trash: [],
+        name: user.user_name,
       };
       await setDoc(doc(db, "users", userId), userRecord);
       toast.success("Your account has been created successfully");

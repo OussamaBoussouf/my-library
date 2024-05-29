@@ -6,10 +6,15 @@ import { signOut } from "firebase/auth";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 
+interface User {
+  uid: string;
+  name: string;
+}
+
 function Avatar() {
   const { toggle, toggleExpand } = useToggle();
 
-  const user = useContext(AuthContext);
+  const user = useContext<User | null>(AuthContext);
 
   const menuNode = useRef<HTMLDivElement>(null);
 
@@ -18,6 +23,7 @@ function Avatar() {
   const navigate = useNavigate();
 
   useClickOutside(menuNode, toggleExpand, toggle);
+
   const logOut = async () => {
     try {
       await signOut(auth);
