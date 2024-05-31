@@ -1,64 +1,63 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useToggle } from "../../hooks/useToggle";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import InputPassword from "../ui/InputPassword";
 import Modal from "../ui/Modal";
-import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signUpSchema } from "../../utils/schemaValidator";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "../../firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
-import { signUpSchema } from "../../utils/schemaValidator";
-
-interface UserInfo {
-  user_name: string;
-  email: string;
-  password: string;
-}
-
+import { useState } from "react";
+import { useAuth } from "../../context/authContext";
+import { UserInfo } from "../../utils/type";
 
 function SignUp() {
   const { toggle: isSignUpOpen, toggleExpand } = useToggle();
-  const [authError, setAuthError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const {logOut} = useAuth();
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    reset,
+    formState: { errors }
   } = useForm<UserInfo>({ resolver: zodResolver(signUpSchema) });
 
   const onSubmit: SubmitHandler<UserInfo> = (data) => {
-    createUser(data);
+    createUser(data.email, data.password, data.name);
   };
-
-  const createUser = async (user: UserInfo) => {
+  const createUser = async (
+    email: string,
+    password: string,
+    userName: string
+  ) => {
     try {
-      setIsLoading(true);
+      setLoading(true);
       const credential = await createUserWithEmailAndPassword(
         auth,
-        user.email,
-        user.password,
+        email,
+        password
       );
-      await updateProfile(credential.user, {displayName: user.user_name})
-      const userId = credential.user.uid;
+      logOut();
+      await updateProfile(credential.user, {
+        displayName: userName,
+      });
       const userRecord = {
-        email: user.email,
-        name: user.user_name,
+        email: email,
+        name: userName,
       };
-      await setDoc(doc(db, "users", userId), userRecord);
-      toast.success("Your account has been created successfully");
-      setIsLoading(false);
-      reset();
+      await setDoc(doc(db, "users", credential.user.uid), userRecord);
+      setLoading(false);
+      setError("");
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code == "auth/email-already-in-use") {
-          setAuthError("This email is already used");
+          setError("This email is already used");
         }
-        setIsLoading(false);
+        setLoading(false);
       }
     }
   };
@@ -79,11 +78,11 @@ function SignUp() {
         >
           <div>
             <Input
-              {...register("user_name", { required: true })}
+              {...register("name", { required: true })}
               type="text"
               placeholder="Username"
             />
-            <span className="text-red-500">{errors.user_name?.message}</span>
+            <span className="text-red-500">{errors.name?.message}</span>
           </div>
           <div>
             <Input
@@ -99,13 +98,9 @@ function SignUp() {
               placeholder="Password"
             />
             <span className="text-red-500">{errors.password?.message}</span>
-            {authError && <span className="text-red-500">{authError}</span>}
+            {error && <span className="text-red-500">{error}</span>}
           </div>
-          <Button
-            type="submit"
-            className="w-full py-4"
-            loading={isLoading}
-          >
+          <Button type="submit" className="w-full py-4" loading={loading}>
             Sign Up
           </Button>
         </form>

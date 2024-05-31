@@ -7,9 +7,8 @@ import TrashBooks from "./TrashBooks";
 
 function Dashboard() {
   const id = useParams().id;
-
   return (
-    <div className="flex max-w-[1200px] mt-20 mx-auto">
+    <div className="flex gap-5 max-w-[1200px] mt-20 mx-auto">
       <Aside />
       <main className="flex-grow">
         {id === "all-books" ? (

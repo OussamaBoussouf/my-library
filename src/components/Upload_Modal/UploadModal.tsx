@@ -7,33 +7,15 @@ import { useToggle } from "../../hooks/useToggle";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uploadBookSchema } from "../../utils/schemaValidator";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "../../firestore";
-import { addDoc, collection} from "firebase/firestore";
-import { generateString } from "../../utils/randomString";
-import { useContext, useState } from "react";
-import { AuthContext } from "../../context/authContext";
+import { useUpload } from "../../hooks/useUpload";
+import toast from "react-hot-toast";
+//Interface
+import { IBook } from "../../utils/type";
 
-//INTERFACE
-interface IBook {
-  id: string;
-  image: FileList;
-  title: string;
-  pdf: FileList;
-  category: string;
-}
-
-interface User {
-  uid: string;
-  name: string;
-}
 
 function UploadModal() {
   const { toggle: isOpen, toggleExpand } = useToggle();
-  const [loading, setLoading] = useState(false);
-  const user = useContext<User | null>(AuthContext);
-
-
+  const { loading, upload } = useUpload();
   const {
     register,
     handleSubmit,
@@ -42,45 +24,11 @@ function UploadModal() {
   } = useForm<IBook>({ resolver: zodResolver(uploadBookSchema) });
 
   const onSubmit: SubmitHandler<IBook> = async (data: IBook) => {
-    setLoading(true);
-    try {
-      const imageName = generateString(5);
-      const fileName = generateString(5);
-      const imageUrl = await uploadFile(data.image[0], "images/" + imageName);
-      const pdfUrl = await uploadFile(data.pdf[0], "files/" + fileName);
-      createRecord(data.category, data.title, imageUrl, pdfUrl);
-      setLoading(false);
+    upload(data).then(() => {
       reset();
       toggleExpand();
-    } catch (err) {
-      console.log(err);
-      setLoading(false);
-    }
-  };
-
-  const uploadFile = async (file: File, path: string) => {
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, file);
-    return getDownloadURL(storageRef);
-  };
-
-  const createRecord = async(
-    category: string,
-    title: string,
-    imageUrl: string,
-    pdfUrl: string
-  ) => {
-    const bookRef = collection(db, "users", `${user?.uid}`, "books");
-    try {
-      await addDoc(bookRef, {
-        title: title,
-        category: category,
-        imageUrl: imageUrl,
-        pdfUrl: pdfUrl 
-      });
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
+      toast.success("Your book has been download");
+    });
   };
 
   return (
@@ -108,7 +56,6 @@ function UploadModal() {
               {...register("image", { required: true })}
               accept="image/*"
               type="file"
-              onChange={(e) => console.log(typeof e.target.value)}
             />
             <span className="text-red-500">{errors.image?.message}</span>
           </div>
