@@ -4,29 +4,18 @@ import Input from "../ui/Input";
 import InputPassword from "../ui/InputPassword";
 import Modal from "../ui/Modal";
 import googleIcon from "../../assets/img/google-icon.webp";
-import {
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-} from "firebase/auth";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { auth, db } from "../../firestore";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FirebaseError } from "firebase/app";
-import { useState } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { logInSchema } from "../../utils/schemaValidator";
 
-interface UserInfo {
-  email: string;
-  password: string;
-}
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { logInSchema } from "../../utils/schemaValidator";
+import { useAuth } from "../../context/authContext";
+//Interface
+import { UserInfo } from "../../utils/type";
 
 
 function Login() {
   const { toggle: isLoginOpen, toggleExpand } = useToggle();
-  const [authError, setAuthError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const {login, error, loginWithGoogle, loading} = useAuth();
 
   const {
     register,
@@ -35,56 +24,9 @@ function Login() {
   } = useForm<UserInfo>({ resolver: zodResolver(logInSchema) });
 
   const onSubmit: SubmitHandler<UserInfo> = (data) => {
-    loginEmailPassword(data);
+    login(data.email, data.password);
   };
 
-  const loginEmailPassword = async (user: UserInfo) => {
-    try {
-      setIsLoading(true);
-      await signInWithEmailAndPassword(auth, user.email, user.password);
-      setIsLoading(false);
-    } catch (err) {
-      if (err instanceof FirebaseError) {
-        if (err.code === "auth/invalid-credential") {
-          setIsLoading(false);
-          setAuthError("This credential doesn't exist");
-        }
-      }
-    }
-  };
-
-  const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: "select_account",
-    });
-    try {
-      const result = await signInWithPopup(auth, provider);
-      GoogleAuthProvider.credentialFromResult(result);
-      const docRef = doc(db, "users", result.user.uid);
-      const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) {
-        const userRecord = {
-          email: result.user.email,
-          books: [],
-          favorites: [],
-          trash: [],
-        };
-        await setDoc(doc(db, "users", result.user.uid), userRecord);
-      }
-    } catch (error) {
-      if (error instanceof FirebaseError) {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData?.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      }
-    }
-  };
 
   return (
     <>
@@ -96,7 +38,6 @@ function Login() {
         modalTitle="Log in"
         open={isLoginOpen}
         onClose={() => {
-          if (authError != "") setAuthError("");
           toggleExpand();
         }}
       >
@@ -118,9 +59,9 @@ function Login() {
               placeholder="Password"
             />
             <span className="text-red-500">{errors.password?.message}</span>
-            <span className="text-red-500">{authError}</span>
+            <span className="text-red-500">{error}</span>
           </div>
-          <Button loading={isLoading} type="submit" className="w-full py-4">
+          <Button loading={loading} type="submit" className="w-full py-4">
             Log In
           </Button>
           <div className="flex items-center w-full">

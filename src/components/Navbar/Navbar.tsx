@@ -1,17 +1,12 @@
-import { useContext } from "react";
 import logo from "../../assets/img/logo.jpg";
 import Login from "../Login/Login";
 import SignUp from "../SignUp/SignUp";
-import { AuthContext } from "../../context/authContext";
+import { useAuth } from "../../context/authContext";
 import Avatar from "../Avatar/Avatar";
 
-interface User {
-  uid: string;
-  name: string;
-}
 
 function Navbar() {
-  const user = useContext<User | null>(AuthContext);
+  const {user} = useAuth();
 
   return (
     <nav className="py-2 px-5 bg-gray-100 shadow-lg">
