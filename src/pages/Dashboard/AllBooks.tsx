@@ -1,25 +1,60 @@
+import { ChangeEvent, useEffect, useState } from "react";
 import Book from "../../components/Book/Book";
 import UploadModal from "../../components/Upload_Modal/UploadModal";
 import Button from "../../components/ui/Button";
 import { useFetch } from "../../hooks/useFetch";
+import { useDebounce } from "../../hooks/useDebounce";
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 4;
+const categories = ["all", "drama", "non-fiction", "fiction"];
 
 function AllBooks() {
+  const [selectedCat, setSelectedCat] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 800);
   const {
     data: allBooks,
     loading,
     nextPage,
     totalLength: count,
-  } = useFetch(PAGE_SIZE);
+    search,
+  } = useFetch(PAGE_SIZE, selectedCat);
 
-  console.log(allBooks);
+  const onSelect = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCat(e.target.value);
+  };
+
+  useEffect(() => {
+    search(searchTerm);
+    console.log("searching...");
+  }, [debouncedSearchTerm]);
 
   return (
     <>
-      <div className="flex justify-between px-5">
+      <div className="flex justify-between mb-4">
         <h2 className="text-4xl font-poetsenOne">All Books</h2>
         <UploadModal />
+      </div>
+      <div className="flex justify-between">
+        <input
+          type="search"
+          name="search"
+          id="search"
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="bg-gray-200 p-1"
+        />
+        <select
+          onChange={onSelect}
+          name="categroy"
+          id="category"
+          className="bg-gray-200 p-1"
+        >
+          {categories.map((category) => (
+            <option key={category} value={category == "all" ? "" : category}>
+              {category}
+            </option>
+          ))}
+        </select>
       </div>
       {loading ? (
         <p className="ps-5 mt-5">Loading...</p>
@@ -39,7 +74,7 @@ function AllBooks() {
       )}
       {allBooks.length != 0 && allBooks.length < count && (
         <div className="flex justify-center py-5">
-          <Button onClick={nextPage}>Loading more</Button>
+          <Button onClick={nextPage}>Load more</Button>
         </div>
       )}
     </>
