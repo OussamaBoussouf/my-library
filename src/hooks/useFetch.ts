@@ -18,7 +18,7 @@ import {
 
 let totalLength: number;
 
-export const useFetch = (pageSize: number, select: string) => {
+export const useFetch = (pageSize: number, select: string, subCollection: string) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<DocumentData[]>([]);
   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
@@ -27,14 +27,13 @@ export const useFetch = (pageSize: number, select: string) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log(select);
         let q, totalData;
         const allData: DocumentData[] = [];
         const booksRef = collection(
           db,
           "users",
           `${auth.currentUser?.uid}`,
-          "books"
+          subCollection
         );
         if (select === "") {
           q = query(booksRef, orderBy("title"), limit(pageSize));
@@ -65,7 +64,7 @@ export const useFetch = (pageSize: number, select: string) => {
     };
 
     fetchData();
-  }, [auth.currentUser, select]);
+  }, [auth.currentUser, select, subCollection]);
 
   const nextPage = async () => {
     const newData: DocumentData[] = [];
@@ -75,7 +74,7 @@ export const useFetch = (pageSize: number, select: string) => {
         db,
         "users",
         `${auth.currentUser?.uid}`,
-        "books"
+        subCollection
       );
       if (select === "") {
         next = query(booksRef,orderBy("title"), startAfter(lastVisible), limit(pageSize));
@@ -93,7 +92,6 @@ export const useFetch = (pageSize: number, select: string) => {
         newData.push(doc.data() as DocumentData);
       });
       const newVisibles = bookDocs.docs[bookDocs.docs.length - 1];
-      console.log(newVisibles);
       setLastVisible(newVisibles);
       setData([...data, ...newData]);
     } catch (err) {
@@ -108,7 +106,7 @@ export const useFetch = (pageSize: number, select: string) => {
       db,
       "users",
       `${auth.currentUser?.uid}`,
-      "books"
+      subCollection
     );
     if (select === "") {
       q = query(
@@ -150,8 +148,6 @@ export const useFetch = (pageSize: number, select: string) => {
     documents.forEach((doc) => {
       allData.push(doc.data());
     });
-    console.log(allData);
-    console.log(totalLength);
     const newVisibles = documents.docs[documents.docs.length - 1];
     setLastVisible(newVisibles);
     setData(allData);
