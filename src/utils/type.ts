@@ -11,6 +11,16 @@ export interface User {
   name: string;
 }
 
+export interface InfoBook {
+  id: string;
+  fileRef: string;
+  fileUrl: string;
+  imageUrl: string;
+  imageRef: string;
+  title: string;
+  category: string;
+}
+
 export interface UserInfo {
   name: string;
   email: string;

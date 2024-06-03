@@ -15,12 +15,13 @@ import {
   startAt,
   where,
 } from "firebase/firestore";
+import { InfoBook } from "../utils/type";
 
 let totalLength: number;
 
 export const useFetch = (pageSize: number, select: string, subCollection: string) => {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<DocumentData[]>([]);
+  const [data, setData] = useState<InfoBook[]>([]);
   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
       try {
         setLoading(true);
         let q, totalData;
-        const allData: DocumentData[] = [];
+        const allData: InfoBook[] = [];
         const booksRef = collection(
           db,
           "users",
@@ -51,7 +52,7 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
         }
         const documents = await getDocs(q);
         documents.forEach((doc) => {
-          allData.push(doc.data());
+          allData.push(doc.data() as InfoBook);
         });
         totalLength = totalData.data().count;
         setLastVisible(documents.docs[documents.docs.length - 1]);
@@ -67,7 +68,7 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
   }, [auth.currentUser, select, subCollection]);
 
   const nextPage = async () => {
-    const newData: DocumentData[] = [];
+    const newData: InfoBook[] = [];
     try {
       let next;
       const booksRef = collection(
@@ -89,7 +90,7 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
       }
       const bookDocs = await getDocs(next);
       bookDocs.forEach((doc) => {
-        newData.push(doc.data() as DocumentData);
+        newData.push(doc.data() as InfoBook);
       });
       const newVisibles = bookDocs.docs[bookDocs.docs.length - 1];
       setLastVisible(newVisibles);
@@ -101,7 +102,7 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
 
   const search = async (keyword: string) => {
     let q, totalData;
-    const allData: DocumentData[] = [];
+    const allData: InfoBook[] = [];
     const booksRef = collection(
       db,
       "users",
@@ -146,7 +147,7 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
     totalLength = totalData.data().count;
     const documents = await getDocs(q);
     documents.forEach((doc) => {
-      allData.push(doc.data());
+      allData.push(doc.data() as InfoBook);
     });
     const newVisibles = documents.docs[documents.docs.length - 1];
     setLastVisible(newVisibles);
