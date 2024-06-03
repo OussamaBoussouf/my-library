@@ -28,7 +28,6 @@ function AllBooks({
     search(searchTerm);
     console.log("searching...");
   }, [debouncedSearchTerm]);
-
   return (
     <>
       {loading ? (
@@ -40,10 +39,7 @@ function AllBooks({
           {books?.map((book) => (
             <Book
               key={book.id}
-              id={book.id}
-              image={book.imageUrl}
-              fileUrl={book.fileUrl}
-              title={book.title}
+              bookInfo={book}
             />
           ))}
         </div>
