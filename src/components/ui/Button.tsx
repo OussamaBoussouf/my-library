@@ -8,11 +8,12 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const buttonVariants = cva(
-  "py-2 font-roboto-bold px-4 rounded-md text-white flex items-center justify-center gap-2",
+  "text-white flex items-center justify-center gap-2",
   {
     variants: {
       variant: {
-        primary: "bg-indigo-500 text-white hover:opacity-80 disabled:opacity-45",
+        primary:
+          "hover:opacity-90 bg-orange-500 w-full py-3 text-sm rounded-md disabled:opacity-45",
         secondary: "text-black hover:text-indigo-500",
       },
     },
@@ -24,9 +25,13 @@ const buttonVariants = cva(
 
 function Button({ variant, className, loading, ...props }: ButtonProps) {
   return (
-    <button disabled={loading} {...props} className={cn(buttonVariants({ variant }), className)}>
+    <button
+      disabled={loading}
+      {...props}
+      className={cn(buttonVariants({ variant }), className)}
+    >
       {loading && (
-        <div className="h-7 w-7 border-[5px] border-r-blue-600 animate-spin  rounded-full "></div>
+        <div className="h-5 w-5 border-[5px] border-r-gray-400 animate-spin  rounded-full "></div>
       )}
       {props.children}
     </button>

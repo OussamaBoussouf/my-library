@@ -4,7 +4,7 @@ import React, { forwardRef, useRef, useState } from "react";
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const InputPassword = forwardRef<HTMLInputElement, InputProps>(function (
-  { placeholder, ...props },
+  {...props },
   ref
 ) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -37,21 +37,20 @@ const InputPassword = forwardRef<HTMLInputElement, InputProps>(function (
         }}
         type="password"
         {...props}
-        className="bg-gray-300 w-full rounded-md placeholder-black py-2 px-4"
-        placeholder={placeholder}
+        className="w-full mt-2 bg-[#222429] rounded-md py-2 px-3" 
       />
       <button type="button" onClick={handleChange}>
         {isPasswordVisible ? (
           <Eye
-            size={20}
+            size={18}
             color="gray"
-            className="absolute right-2 top-1/2 -translate-y-[50%]"
+            className="absolute right-3 top-[50%] -translate-y-[30%]"
           />
         ) : (
           <EyeOff
-            size={20}
+            size={18}
             color="gray"
-            className="absolute right-2 top-1/2 -translate-y-[50%]"
+            className="absolute right-3 top-1/2 -translate-y-[30%]"
           />
         )}
       </button>

@@ -1,9 +1,11 @@
 import {
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import {
   ReactNode,
@@ -15,7 +17,9 @@ import {
 import { auth, db } from "../firestore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
-import { User, Context } from "../utils/type";
+import { Context } from "../utils/type";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export const AuthContext = createContext<Context | null>(null);
 
@@ -28,20 +32,28 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+
+  const resetError = () => {
+    setError("");
+  }
 
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
+      navigate("/dashboard/home");
       setLoading(false);
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code === "auth/invalid-credential") {
+          setError(
+            "This credential doesn't exist or the password is incorrect"
+          );
           setLoading(false);
-          setError("This credential doesn't exist");
         }
       }
     }
@@ -64,9 +76,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
         await setDoc(doc(db, "users", result.user.uid), userRecord);
       }
+      navigate("/dashboard/home");
     } catch (error) {
       if (error instanceof FirebaseError) {
         console.log(error);
+      }
+    }
+  };
+
+  const signUp = async (email: string, password: string, username: string) => {
+    try {
+      setLoading(true);
+      const credential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      logOut();
+      await updateProfile(credential.user, {
+        displayName: username,
+      });
+      const userRecord = {
+        email: email,
+        username: username,
+      };
+      await setDoc(doc(db, "users", credential.user.uid), userRecord);
+      setLoading(false);
+      setError("");
+      toast.success("Your account has been created");
+      navigate("/sign-in");
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        if (err.code == "auth/email-already-in-use") {
+          setError("This email is already used");
+        }
+        setLoading(false);
       }
     }
   };
@@ -82,24 +126,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (userInfo) => {
       if (userInfo) {
-        setUser({
-          uid: userInfo.uid,
-          name: userInfo.displayName as string,
-        });
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            uid: userInfo.uid,
+            name: userInfo.displayName as string,
+          })
+        );
       } else {
-        setUser(null);
+        localStorage.removeItem("user");
       }
     });
     return () => unsubscribe();
   }, []);
 
+
   const allValue = {
-    user,
     loading,
     error,
+    resetError,
     login,
     loginWithGoogle,
     logOut,
+    signUp
   };
 
   return (
