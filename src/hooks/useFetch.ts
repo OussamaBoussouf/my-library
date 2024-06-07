@@ -19,21 +19,25 @@ import { InfoBook } from "../utils/type";
 
 let totalLength: number;
 
-export const useFetch = (pageSize: number, select: string, subCollection: string) => {
-  const [loading, setLoading] = useState(false);
+export const useFetch = (
+  pageSize: number,
+  select: string,
+  subCollection: string
+) => {
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState<InfoBook[]>([]);
   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
+  const user = JSON.parse(localStorage.getItem("user") as string);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
         let q, totalData;
         const allData: InfoBook[] = [];
         const booksRef = collection(
           db,
           "users",
-          `${auth.currentUser?.uid}`,
+          `${user?.uid}`,
           subCollection
         );
         if (select === "") {
@@ -65,7 +69,7 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
     };
 
     fetchData();
-  }, [auth.currentUser, select, subCollection]);
+  }, [select, subCollection]);
 
   const nextPage = async () => {
     const newData: InfoBook[] = [];
@@ -74,11 +78,16 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
       const booksRef = collection(
         db,
         "users",
-        `${auth.currentUser?.uid}`,
+        `${user?.uid}`,
         subCollection
       );
       if (select === "") {
-        next = query(booksRef,orderBy("title"), startAfter(lastVisible), limit(pageSize));
+        next = query(
+          booksRef,
+          orderBy("title"),
+          startAfter(lastVisible),
+          limit(pageSize)
+        );
       } else {
         next = query(
           booksRef,
@@ -106,7 +115,7 @@ export const useFetch = (pageSize: number, select: string, subCollection: string
     const booksRef = collection(
       db,
       "users",
-      `${auth.currentUser?.uid}`,
+      `${user?.uid}`,
       subCollection
     );
     if (select === "") {

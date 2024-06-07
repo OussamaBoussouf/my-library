@@ -22,7 +22,7 @@ export interface InfoBook {
 }
 
 export interface UserInfo {
-  name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -33,10 +33,11 @@ export interface UserLogin {
 }
 
 export interface Context {
-  user: User | null;
   loading: boolean;
   error: string;
-  login: (email: string, password: string) => void;
+  resetError: () => void;
+  login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => void;
-  logOut: () => void;
+  logOut: () => Promise<void>;
+  signUp: (email: string, password: string, username: string) => Promise<void>;
 }
