@@ -1,0 +1,48 @@
+import Button from "../ui/Button";
+import logo from "../../assets/img/mainLogo.png";
+//ICONS
+import { Home, Star, Trash, SquarePen } from "lucide-react";
+
+const sidebarItems = [
+  {
+    icon: <Home color="#737477" />,
+    text: "Home",
+  },
+  {
+    icon: <Star color="#737477" />,
+    text: "Favorite",
+  },
+  {
+    icon: <Trash color="#737477" />,
+    text: "Trash",
+  },
+  {
+    icon: <SquarePen color="#737477" />,
+    text: "Create New Book",
+  },
+];
+
+function Sidebar() {
+  return (
+    <div className="text-white py-6 hidden sm:block w-[200px] md:w-[250px] fixed top-0 bottom-0 bg-[#15171c] ">
+      <div className="flex items-center px-6 mb-16">
+        <img width={30} height={30} src={logo} alt="logo" className="mr-2" />
+        <h1 className="text-xl font-bold">Libro</h1>
+      </div>
+      <div className="flex flex-col justify-between h-[80%] text-[#737477]">
+        <ul className="space-y-2">
+          {sidebarItems.map((item) => (
+            <li className="hover:bg-gradient-to-r from-[#232529] to-[#17191e] hover:border-r-4 hover:border-orange-500 hover:text-white text-sm md:text-base cursor-pointer px-6 py-4 flex items-center gap-4">
+              {item.icon} {item.text}
+            </li>
+          ))}
+        </ul>
+        <div className="px-6">
+          <Button>Logout</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Sidebar;
