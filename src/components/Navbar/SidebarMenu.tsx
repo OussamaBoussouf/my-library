@@ -31,8 +31,8 @@ function SidebarMenu({
   return (
     <div
       className={`text-white ${
-        open ? "-translate-x-[100%]" : "-translate-x-[0%]"
-      } transition-all duration-700 w-[80vw] max-w-[300px] bg-[#15171c] top-0 left-0 bottom-0 fixed py-6`}
+        open ? "-translate-x-[0%]" : "-translate-x-[100%]"
+      } transition-all duration-700 w-[80vw] max-w-[300px] bg-[#15171c] top-0 left-0 bottom-0 fixed z-10 py-6`}
     >
       <button onClick={onClick} type="button" className="float-end me-2">
         <X />
@@ -43,8 +43,11 @@ function SidebarMenu({
       </div>
       <div className="flex flex-col justify-between h-[80%] text-[#737477]">
         <ul className="space-y-2">
-        {sidebarItems.map((item) => (
-            <li className="hover:bg-gradient-to-r from-[#232529] to-[#17191e] hover:border-r-4 hover:border-orange-500 hover:text-white cursor-pointer px-6 py-4 flex items-center gap-4">
+          {sidebarItems.map((item, index) => (
+            <li
+              key={index}
+              className="hover:bg-gradient-to-r from-[#232529] to-[#17191e] hover:border-r-4 hover:border-orange-500 hover:text-white cursor-pointer px-6 py-4 flex items-center gap-4"
+            >
               {item.icon} {item.text}
             </li>
           ))}
