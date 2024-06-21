@@ -2,7 +2,7 @@ import { useState } from "react";
 import { generateString } from "../utils/randomString";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { auth, db, storage } from "../firestore";
-import { addDoc, collection } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
 import { Data } from "../utils/type";
 
@@ -12,6 +12,7 @@ export const useUpload = () => {
 
   const upload = async (entry: Data) => {
     const bookRecord = new Map();
+    const id = generateString(20);
     try {
       setLoading(true);
       for (const [key, value] of Object.entries(entry)) {
@@ -28,12 +29,21 @@ export const useUpload = () => {
             bookRecord.set("fileRef", fileRef);
           }
         } else {
-          bookRecord.set(key, value);
+          bookRecord.set(key, (value as string).toLowerCase());
         }
       }
-      const bookRef = collection(db, "users", `${auth.currentUser?.uid}`, "books");
+
+      bookRecord.set("createdAt", serverTimestamp());
+      bookRecord.set("trash", false);
+      bookRecord.set("favorite", false);
+      bookRecord.set("id", id);
+      const bookRef = doc(
+        db,
+        `users/${auth.currentUser?.uid}/books`,
+        id
+      );
       const docRecord = Object.fromEntries(bookRecord);
-      await addDoc(bookRef, docRecord);
+      await setDoc(bookRef, docRecord);
       setLoading(false);
     } catch (err) {
       console.log(err);

@@ -30,7 +30,7 @@ function Dialog({
       await deleteObject(imageRef);
       await deleteObject(fileRef);
       await deleteDoc(
-        doc(db, `users/${auth.currentUser?.uid}/trash`, document.id)
+        doc(db, `users/${auth.currentUser?.uid}/books`, document.id)
       );
       toast.success("This book has been deleted successfully");
       onClose();
@@ -45,22 +45,22 @@ function Dialog({
         <div
           ref={divNode}
           onClick={handleClose}
-          className="bg-transparent-black text-start fixed z-20 inset-0 grid place-content-center"
+          className="bg-transparent-black text-start fixed z-50 inset-0 grid place-content-center"
         >
           <div
             role="alertdialog"
             aria-haspopup="dialog"
             className="p-5 bg-white rounded-lg mx-3 max-w-[550px]"
           >
-            <h2 className="text-lg font-bold mb-5">Are you absolutely sure?</h2>
-            <p className="mb-5">
+            <h2 className="text-lg font-bold mb-5 text-black">Are you absolutely sure?</h2>
+            <p className="mb-5 text-black">
               This action cannot be undone. This will permanently delete this
               book and remove it entirely.
             </p>
             <div className="flex justify-end">
               <button
                 type="button"
-                className="py-2 px-5 border-[2px] rounded-md hover:bg-slate-200"
+                className="text-black py-2 px-5 border-[2px] rounded-md hover:bg-slate-200"
                 onClick={onClose}
               >
                 Cancel

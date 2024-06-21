@@ -18,6 +18,8 @@ export interface InfoBook {
   imageUrl: string;
   imageRef: string;
   title: string;
+  favorite: boolean;
+  trash: boolean;
   category: string;
 }
 
