@@ -1,207 +1,148 @@
-// hook should return data, loading, error
-
 import { useEffect, useState } from "react";
 import { db } from "../firestore";
 import {
-  DocumentData,
   collection,
-  endAt,
-  getCountFromServer,
   getDocs,
-  limit,
+  onSnapshot,
   orderBy,
   query,
-  startAfter,
-  startAt,
   where,
 } from "firebase/firestore";
 import { InfoBook } from "../utils/type";
-
-let totalLength: number;
-
-// export const useFetch = (
-//   pageSize: number,
-//   select: string,
-//   subCollection: string
-// ) => {
-//   const [loading, setLoading] = useState(true);
-//   const [data, setData] = useState<InfoBook[]>([]);
-//   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
-//   const user = JSON.parse(localStorage.getItem("user") as string);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         let q, totalData;
-//         const allData: InfoBook[] = [];
-//         const booksRef = collection(
-//           db,
-//           "users",
-//           `${user?.uid}`,
-//           subCollection
-//         );
-//         if (select === "") {
-//           q = query(booksRef, orderBy("title"), limit(pageSize));
-//           totalData = await getCountFromServer(booksRef);
-//         } else {
-//           q = query(
-//             booksRef,
-//             orderBy("title"),
-//             where("category", "==", select),
-//             limit(pageSize)
-//           );
-//           totalData = await getCountFromServer(
-//             query(booksRef, where("category", "==", select))
-//           );
-//         }
-//         const documents = await getDocs(q);
-//         documents.forEach((doc) => {
-//           allData.push(doc.data() as InfoBook);
-//         });
-//         totalLength = totalData.data().count;
-//         setLastVisible(documents.docs[documents.docs.length - 1]);
-//         setData(allData);
-//         setLoading(false);
-//       } catch (err) {
-//         console.log(err);
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, [select, subCollection]);
-
-//   const nextPage = async () => {
-//     const newData: InfoBook[] = [];
-//     try {
-//       let next;
-//       const booksRef = collection(
-//         db,
-//         "users",
-//         `${user?.uid}`,
-//         subCollection
-//       );
-//       if (select === "") {
-//         next = query(
-//           booksRef,
-//           orderBy("title"),
-//           startAfter(lastVisible),
-//           limit(pageSize)
-//         );
-//       } else {
-//         next = query(
-//           booksRef,
-//           orderBy("title"),
-//           startAfter(lastVisible),
-//           where("category", "==", select),
-//           limit(pageSize)
-//         );
-//       }
-//       const bookDocs = await getDocs(next);
-//       bookDocs.forEach((doc) => {
-//         newData.push(doc.data() as InfoBook);
-//       });
-//       const newVisibles = bookDocs.docs[bookDocs.docs.length - 1];
-//       setLastVisible(newVisibles);
-//       setData([...data, ...newData]);
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   };
-
-//   const search = async (keyword: string) => {
-//     let q, totalData;
-//     const allData: InfoBook[] = [];
-//     const booksRef = collection(
-//       db,
-//       "users",
-//       `${user?.uid}`,
-//       subCollection
-//     );
-//     if (select === "") {
-//       q = query(
-//         booksRef,
-//         orderBy("title"),
-//         startAt(keyword),
-//         endAt(keyword + "\uf8ff"),
-//         limit(pageSize)
-//       );
-//       totalData = await getCountFromServer(
-//         query(
-//           booksRef,
-//           orderBy("title"),
-//           startAt(keyword),
-//           endAt(keyword + "\uf8ff")
-//         )
-//       );
-//     } else {
-//       q = query(
-//         booksRef,
-//         orderBy("title"),
-//         startAt(keyword),
-//         endAt(keyword + "\uf8ff"),
-//         where("category", "==", select),
-//         limit(pageSize)
-//       );
-//       totalData = await getCountFromServer(
-//         query(
-//           booksRef,
-//           orderBy("title"),
-//           startAt(keyword),
-//           where("category", "==", select),
-//           endAt(keyword + "\uf8ff")
-//         )
-//       );
-//     }
-//     totalLength = totalData.data().count;
-//     const documents = await getDocs(q);
-//     documents.forEach((doc) => {
-//       allData.push(doc.data() as InfoBook);
-//     });
-//     const newVisibles = documents.docs[documents.docs.length - 1];
-//     setLastVisible(newVisibles);
-//     setData(allData);
-//   };
-
-//   const value = {
-//     loading,
-//     data,
-//     lastVisible,
-//     totalLength,
-//     nextPage,
-//     search,
-//   };
-
-//   return value;
-// };
+import { useLocation } from "react-router-dom";
 
 export const useFetch = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [cloneData, setCloneData] = useState<InfoBook[]>([]);
   const [data, setData] = useState<InfoBook[]>([]);
+  const [isEmpty, setIsEmpty] = useState(false);
+  const [hasNoBooks, setHasNoBooks] = useState(false);
   const user = JSON.parse(localStorage.getItem("user") as string);
+  const location = useLocation().pathname;
 
   useEffect(() => {
-    const fetchData = async () => {
-      const books: InfoBook[] = [];
-      try {
-        const q = query(
-          collection(db, "users", user?.uid, "books"),
-          where("trash", "==", false)
-        );
-        const documents = await getDocs(q);
-        documents.forEach((doc) => {
+    if (location != "/dashboard/create-book") {
+      let dataQuery;
+      switch (location) {
+        case "/dashboard/favorite":
+          dataQuery = query(
+            collection(db, "users", user?.uid, "books"),
+            where("favorite", "==", true),
+            where("trash", "==", false),
+            orderBy("createdAt")
+          );
+          break;
+        case "/dashboard/trash":
+          dataQuery = query(
+            collection(db, "users", user?.uid, "books"),
+            where("trash", "==", true),
+            orderBy("createdAt")
+          );
+          break;
+        default:
+          dataQuery = query(
+            collection(db, "users", user?.uid, "books"),
+            where("trash", "==", false),
+            orderBy("createdAt")
+          );
+          break;
+      }
+      if (hasNoBooks) setHasNoBooks(false);
+      if (isEmpty) setIsEmpty(false);
+      setLoading(true);
+      setData([]);
+      const unsubscribe = onSnapshot(dataQuery, (querySnapshot) => {
+        const books: InfoBook[] = [];
+        querySnapshot.forEach((doc) => {
           books.push(doc.data() as InfoBook);
         });
+        if (books.length == 0) setHasNoBooks(true);
         setData(books);
-      } catch (err) {
-        console.log(err);
+        setCloneData(books);
+        setLoading(false);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [location]);
+
+  // SELECT CATEGORY
+  const selectCat = async (category: string, bookCollection: string) => {
+    const books: InfoBook[] = [];
+
+    if (hasNoBooks) setHasNoBooks(false);
+
+    try {
+      let q;
+      setData([]);
+      setLoading(true);
+      if (category === "all" && bookCollection !== "") {
+        q = query(
+          collection(db, "users", user?.uid, "books"),
+          orderBy("createdAt"),
+          where(bookCollection, "==", true)
+        );
+      } else if (category === "all" && bookCollection === "") {
+        q = query(
+          collection(db, "users", user?.uid, "books"),
+          orderBy("createdAt"),
+          where("trash", "==", false)
+        );
+      } else if (category !== "all" && bookCollection === "") {
+        q = query(
+          collection(db, "users", user?.uid, "books"),
+          orderBy("createdAt"),
+          where("category", "==", category),
+          where("trash", "==", false)
+        );
+      } else {
+        q = query(
+          collection(db, "users", user?.uid, "books"),
+          orderBy("createdAt"),
+          where("category", "==", category),
+          where(bookCollection, "==", true)
+        );
       }
-    };
+      const documents = await getDocs(q);
+      documents.forEach((doc) => {
+        books.push(doc.data() as InfoBook);
+      });
 
-    fetchData();
-  }, []);
+      // WHENE YOU SELECT CATEGORY THAT HAS NO BOOKS
+      if (books.length == 0) {
+        setHasNoBooks(true);
+        setLoading(false);
+        if (data.length != 0) setData([]);
+        return;
+      }
 
-  const value = {data};
+      if (isEmpty) setIsEmpty(false);
+      setLoading(false);
+      setData(books);
+      setCloneData(books);
+    } catch (err) {
+      setLoading(false);
+      console.error(err);
+    }
+  };
+
+  // SEARCH FOR KEYWORD
+  const search = (keyword: string) => {
+    if (hasNoBooks) return;
+
+    const books: InfoBook[] = cloneData.filter((book) =>
+      book.title.includes(keyword)
+    );
+
+    if (books.length == 0) {
+      setIsEmpty(true);
+    } else {
+      if (isEmpty) setIsEmpty(false);
+    }
+    setData(books);
+  };
+
+  const value = { data, selectCat, search, loading, isEmpty, hasNoBooks };
 
   return value;
 };

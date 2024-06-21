@@ -1,8 +1,8 @@
 import Button from "../ui/Button";
-import logo from "../../assets/img/mainLogo.png";
+import logo from "../../assets/orange-book.svg";
 //ICONS
 import { Home, Star, Trash, SquarePen } from "lucide-react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation} from "react-router-dom";
 
 const sidebarItems = [
   {

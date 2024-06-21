@@ -1,6 +1,6 @@
 import { Menu } from "lucide-react";
 import { useToggle } from "../../hooks/useToggle";
-import logo from "../../assets/img/mainLogo.png";
+import logo from "../../assets/orange-book.svg";
 import SidebarMenu from "./SidebarMenu";
 
 function Navbar() {
@@ -8,7 +8,7 @@ function Navbar() {
 
   return (
     <nav className="sm:hidden">
-      <div className="flex items-center justify-between p-3">
+      <div className="flex items-center justify-between p-5">
         <img height={30} width={30} src={logo} alt="logo" />
         <button onClick={toggleExpand} type="button">
           <Menu color="gray"/>

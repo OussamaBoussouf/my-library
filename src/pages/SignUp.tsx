@@ -74,7 +74,7 @@ function SignUp() {
             </Button>
           </form>
           <p>
-            Already have an account ?{" "}
+            Already have an account ?
             <Link to="/" className="text-orange-400">
               Sign in
             </Link>

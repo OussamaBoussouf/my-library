@@ -1,23 +1,29 @@
 import { Home, SquarePen, Star, Trash, X } from "lucide-react";
-import logo from "../../assets/img/mainLogo.png";
+import logo from "../../assets/orange-book.svg";
 import Button from "../ui/Button";
+import { Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const sidebarItems = [
   {
     icon: <Home color="#737477" />,
     text: "Home",
+    url: "/dashboard",
   },
   {
     icon: <Star color="#737477" />,
     text: "Favorite",
+    url: "/dashboard/favorite",
   },
   {
     icon: <Trash color="#737477" />,
     text: "Trash",
+    url: "/dashboard/trash",
   },
   {
     icon: <SquarePen color="#737477" />,
     text: "Create New Book",
+    url: "/dashboard/create-book",
   },
 ];
 
@@ -28,6 +34,12 @@ function SidebarMenu({
   open: boolean;
   onClick: () => void;
 }) {
+  const location = useLocation().pathname;
+
+  useEffect(() => {
+    if (open) onClick();
+  }, [location]);
+
   return (
     <div
       className={`text-white ${
@@ -44,12 +56,17 @@ function SidebarMenu({
       <div className="flex flex-col justify-between h-[80%] text-[#737477]">
         <ul className="space-y-2">
           {sidebarItems.map((item, index) => (
-            <li
-              key={index}
-              className="hover:bg-gradient-to-r from-[#232529] to-[#17191e] hover:border-r-4 hover:border-orange-500 hover:text-white cursor-pointer px-6 py-4 flex items-center gap-4"
-            >
-              {item.icon} {item.text}
-            </li>
+            <Link key={index} to={item.url}>
+              <li
+                className={`${
+                  location == item.url
+                    ? "bg-gradient-to-r from-[#232529] to-[#17191e] border-r-4 border-orange-500 text-white"
+                    : ""
+                } hover:bg-gradient-to-r from-[#232529] to-[#17191e] hover:border-r-4 hover:border-orange-500 hover:text-white text-sm md:text-base cursor-pointer px-6 py-4 flex items-center gap-4`}
+              >
+                {item.icon} {item.text}
+              </li>
+            </Link>
           ))}
         </ul>
         <div className="px-6">
