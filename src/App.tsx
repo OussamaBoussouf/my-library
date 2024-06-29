@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
@@ -14,19 +14,6 @@ const Home = lazy(() => import("./pages/Home"));
 const CreateBook = lazy(() => import("./pages/CreateBook"));
 
 function App() {
-  // const location = useLocation();
-  // const navigate = useNavigate();
-  // useEffect(() => {
-  //   if(location.pathname != "/dashboard") localStorage.setItem("currentPath", location.pathname);
-  // }, [location]);
-
-  // useEffect(() => {
-  //   const savedPath = localStorage.getItem("currentPath");
-  //   if (savedPath) {
-  //     // navigate("/dashboard/favorite");
-  //   }
-  // }, []);
-
     return (
     <AuthProvider>
       <Routes>
