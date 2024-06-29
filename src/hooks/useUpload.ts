@@ -5,6 +5,7 @@ import { auth, db, storage } from "../firestore";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
 import { Data } from "../utils/type";
+import toast from "react-hot-toast";
 
 export const useUpload = () => {
   const [loading, setLoading] = useState(false);
@@ -37,17 +38,17 @@ export const useUpload = () => {
       bookRecord.set("trash", false);
       bookRecord.set("favorite", false);
       bookRecord.set("id", id);
-      const bookRef = doc(
-        db,
-        `users/${auth.currentUser?.uid}/books`,
-        id
-      );
+      const bookRef = doc(db, `users/${auth.currentUser?.uid}/books`, id);
       const docRecord = Object.fromEntries(bookRecord);
       await setDoc(bookRef, docRecord);
+      toast.success("Your book has been download");
+      if(error) setError("");
       setLoading(false);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       if (err instanceof FirebaseError) {
+        toast.error("Something went wrong");
+        console.log(err);
         setError(err.message);
       }
       setLoading(false);

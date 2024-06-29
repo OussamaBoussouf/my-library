@@ -8,7 +8,6 @@ export interface IBook {
 
 export interface User {
   uid: string;
-  name: string;
 }
 
 export interface InfoBook {
@@ -37,9 +36,24 @@ export interface UserLogin {
 export interface Context {
   loading: boolean;
   error: string;
+  user: User | null;
   resetError: () => void;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => void;
   logOut: () => Promise<void>;
   signUp: (email: string, password: string, username: string) => Promise<void>;
+}
+
+export interface IBookContext {
+  data: InfoBook[];
+  selectCat: (category: string, type: string) => void;
+  search: (keyword: string) => void;
+  loading: boolean;
+  isEmpty: boolean;
+  hasNoBooks: boolean;
+  moveToTrash: (docId: string) => Promise<void>;
+  addToFavorite: (docId: string) => Promise<void>;
+  removeFromFavorite: (docId: string) => Promise<void>;
+  restoreBook: (docId: string) => Promise<void>;
+  deleteBook: (doc: InfoBook) => Promise<void>;
 }

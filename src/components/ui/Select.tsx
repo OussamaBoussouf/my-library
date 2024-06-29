@@ -1,5 +1,3 @@
-// import { forwardRef } from "react";
-
 import { ListFilter } from "lucide-react";
 import { useToggle } from "../../hooks/useToggle";
 import { useRef, useState } from "react";
@@ -8,6 +6,7 @@ import { useBook } from "../../context/bookContext";
 import { useLocation } from "react-router-dom";
 
 const options = [
+  "all",
   "fantasy",
   "mystery",
   "romance",
