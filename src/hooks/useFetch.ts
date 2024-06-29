@@ -1,69 +1,87 @@
 import { useEffect, useState } from "react";
-import { db } from "../firestore";
+import { db, storage } from "../firestore";
 import {
   collection,
+  deleteDoc,
+  doc,
+  getDoc,
   getDocs,
-  onSnapshot,
   orderBy,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { InfoBook } from "../utils/type";
 import { useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
+import { deleteObject, ref } from "firebase/storage";
 
 export const useFetch = () => {
+  const user = JSON.parse(localStorage.getItem("user") as string);
   const [loading, setLoading] = useState(false);
   const [cloneData, setCloneData] = useState<InfoBook[]>([]);
   const [data, setData] = useState<InfoBook[]>([]);
   const [isEmpty, setIsEmpty] = useState(false);
   const [hasNoBooks, setHasNoBooks] = useState(false);
-  const user = JSON.parse(localStorage.getItem("user") as string);
   const location = useLocation().pathname;
 
-  useEffect(() => {
-    if (location != "/dashboard/create-book") {
-      let dataQuery;
-      switch (location) {
-        case "/dashboard/favorite":
-          dataQuery = query(
-            collection(db, "users", user?.uid, "books"),
-            where("favorite", "==", true),
-            where("trash", "==", false),
-            orderBy("createdAt")
-          );
-          break;
-        case "/dashboard/trash":
-          dataQuery = query(
-            collection(db, "users", user?.uid, "books"),
-            where("trash", "==", true),
-            orderBy("createdAt")
-          );
-          break;
-        default:
-          dataQuery = query(
-            collection(db, "users", user?.uid, "books"),
-            where("trash", "==", false),
-            orderBy("createdAt")
-          );
-          break;
-      }
-      if (hasNoBooks) setHasNoBooks(false);
-      if (isEmpty) setIsEmpty(false);
-      setLoading(true);
-      setData([]);
-      const unsubscribe = onSnapshot(dataQuery, (querySnapshot) => {
-        const books: InfoBook[] = [];
-        querySnapshot.forEach((doc) => {
-          books.push(doc.data() as InfoBook);
-        });
-        if (books.length == 0) setHasNoBooks(true);
-        setData(books);
-        setCloneData(books);
-        setLoading(false);
-      });
+  let dataQuery;
+  switch (location) {
+    case "/dashboard/favorite":
+      dataQuery = query(
+        collection(db, "users", user?.uid, "books"),
+        where("favorite", "==", true),
+        where("trash", "==", false),
+        orderBy("createdAt")
+      );
+      break;
+    case "/dashboard/trash":
+      dataQuery = query(
+        collection(db, "users", user?.uid, "books"),
+        where("trash", "==", true),
+        orderBy("createdAt")
+      );
+      break;
+    default:
+      dataQuery = query(
+        collection(db, "users", user?.uid, "books"),
+        where("trash", "==", false),
+        orderBy("createdAt")
+      );
+      break;
+  }
 
-      return () => unsubscribe();
-    }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsEmpty(false);
+        setHasNoBooks(false);
+        setLoading(true);
+        setData([]);
+        console.log(`Before fetch: ${hasNoBooks}`);
+        const books: InfoBook[] = [];
+        const querySnapshot = await getDocs(dataQuery);
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            books.push(doc.data() as InfoBook);
+            console.log("first");
+          });
+          setData(books);
+          setHasNoBooks(false);
+          setCloneData(books);
+          setLoading(false);
+        } else {
+          console.log("There is no book");
+          setHasNoBooks(true);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.log(err);
+        setLoading(false);
+      }
+    };
+
+    if (location != "/dashboard/create-book") fetchData();
   }, [location]);
 
   // SELECT CATEGORY
@@ -78,26 +96,26 @@ export const useFetch = () => {
       setLoading(true);
       if (category === "all" && bookCollection !== "") {
         q = query(
-          collection(db, "users", user?.uid, "books"),
+          collection(db, "users", user!.uid, "books"),
           orderBy("createdAt"),
           where(bookCollection, "==", true)
         );
       } else if (category === "all" && bookCollection === "") {
         q = query(
-          collection(db, "users", user?.uid, "books"),
+          collection(db, "users", user!.uid, "books"),
           orderBy("createdAt"),
           where("trash", "==", false)
         );
       } else if (category !== "all" && bookCollection === "") {
         q = query(
-          collection(db, "users", user?.uid, "books"),
+          collection(db, "users", user!.uid, "books"),
           orderBy("createdAt"),
           where("category", "==", category),
           where("trash", "==", false)
         );
       } else {
         q = query(
-          collection(db, "users", user?.uid, "books"),
+          collection(db, "users", user!.uid, "books"),
           orderBy("createdAt"),
           where("category", "==", category),
           where(bookCollection, "==", true)
@@ -142,7 +160,86 @@ export const useFetch = () => {
     setData(books);
   };
 
-  const value = { data, selectCat, search, loading, isEmpty, hasNoBooks };
+  const moveToTrash = async (docId: string) => {
+    try {
+      const docRef = doc(db, `users/${user?.uid}/books`, docId);
+      await updateDoc(docRef, { trash: true, favorite: false });
+      if (data.length == 1) setHasNoBooks(true);
+      setData((prev) => prev.filter((book) => book.id != docId));
+      toast.success("This book has been moved to trash");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const addToFavorite = async (docId: string) => {
+    try {
+      const docRef = doc(db, `users/${user?.uid}/books`, docId);
+      const book = await getDoc(docRef);
+      const bookInfo = book.data() as InfoBook;
+      if (bookInfo.favorite) {
+        toast.error("This book is already in your favorite");
+      } else {
+        await updateDoc(docRef, { favorite: true });
+        toast.success("This book has been added to favorite");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const removeFromFavorite = async (docId: string) => {
+    try {
+      const docRef = doc(db, `users/${user?.uid}/books`, docId);
+      await updateDoc(docRef, { favorite: false });
+      if (data.length == 1) setHasNoBooks(true);
+      setData((prev) => prev.filter((book) => book.id != docId));
+      toast.success("This book has been removed from favorite");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const restoreBook = async (docId: string) => {
+    try {
+      const docRef = doc(db, `users/${user?.uid}/books`, docId);
+      await updateDoc(docRef, { trash: false });
+      if (data.length == 1) setHasNoBooks(true);
+      setData((prev) => prev.filter((book) => book.id != docId));
+      toast.success("This book has been restored");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const deleteBook = async (document: InfoBook) => {
+    try {
+      const imageRef = ref(storage, "images/" + document.imageRef);
+      const fileRef = ref(storage, "files/" + document.fileRef);
+      await deleteObject(imageRef);
+      await deleteObject(fileRef);
+      await deleteDoc(doc(db, `users/${user?.uid}/books`, document.id));
+      setData((prev) => prev.filter((book) => book.id != document.id));
+      toast.success("This book has been deleted successfully");
+    } catch (err) {
+      toast.error("Ops something went wrong");
+      console.log(err);
+    }
+  };
+
+  const value = {
+    data,
+    selectCat,
+    search,
+    moveToTrash,
+    addToFavorite,
+    removeFromFavorite,
+    deleteBook,
+    restoreBook,
+    loading,
+    isEmpty,
+    hasNoBooks,
+  };
 
   return value;
 };

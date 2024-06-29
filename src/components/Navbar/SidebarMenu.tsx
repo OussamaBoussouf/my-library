@@ -3,6 +3,7 @@ import logo from "../../assets/orange-book.svg";
 import Button from "../ui/Button";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { useAuth } from "../../context/authContext";
 
 const sidebarItems = [
   {
@@ -35,6 +36,7 @@ function SidebarMenu({
   onClick: () => void;
 }) {
   const location = useLocation().pathname;
+  const {logOut} = useAuth();
 
   useEffect(() => {
     if (open) onClick();
@@ -70,7 +72,7 @@ function SidebarMenu({
           ))}
         </ul>
         <div className="px-6">
-          <Button>Logout</Button>
+          <Button onClick={logOut}>Logout</Button>
         </div>
       </div>
     </div>

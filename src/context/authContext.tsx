@@ -17,7 +17,7 @@ import {
 import { auth, db } from "../firestore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
-import { Context } from "../utils/type";
+import { Context, User } from "../utils/type";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -34,18 +34,17 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [user, setUser] = useState<User | null>(JSON.parse(localStorage.getItem("user") as string) || null);
   const navigate = useNavigate();
-
-
   const resetError = () => {
     setError("");
-  }
+  };
 
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard/home");
+      // navigate("/dashboard");
       setLoading(false);
     } catch (err) {
       if (err instanceof FirebaseError) {
@@ -76,7 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
         await setDoc(doc(db, "users", result.user.uid), userRecord);
       }
-      navigate("/dashboard/home");
+      navigate("/dashboard");
     } catch (error) {
       if (error instanceof FirebaseError) {
         console.log(error);
@@ -130,25 +129,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           "user",
           JSON.stringify({
             uid: userInfo.uid,
-            name: userInfo.displayName as string,
           })
         );
+        setUser({ uid: userInfo.uid });
+        navigate("/dashboard");
       } else {
         localStorage.removeItem("user");
+        setUser(null);
+        navigate("/");
       }
     });
     return () => unsubscribe();
   }, []);
 
-
   const allValue = {
     loading,
     error,
+    user,
     resetError,
     login,
     loginWithGoogle,
     logOut,
-    signUp
+    signUp,
   };
 
   return (

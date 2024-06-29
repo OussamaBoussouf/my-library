@@ -6,7 +6,6 @@ import { IBook } from "../utils/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uploadBookSchema } from "../utils/schemaValidator";
 import { useUpload } from "../hooks/useUpload";
-import toast from "react-hot-toast";
 
 function CreateBook() {
   const {
@@ -17,13 +16,12 @@ function CreateBook() {
     reset,
   } = useForm<IBook>({ resolver: zodResolver(uploadBookSchema) });
 
-  const { loading, upload } = useUpload();
+  const { error, loading, upload } = useUpload();
 
   const onSubmit: SubmitHandler<IBook> = async (data: IBook) => {
     upload(data).then(() => {
-        reset();
-        toast.success("Your book has been download");
-    })
+      if (!error) reset();
+    });
   };
 
   return (
@@ -66,7 +64,12 @@ function CreateBook() {
           />
           <span className="text-red-500">{errors.pdf?.message}</span>
         </div>
-        <Button loading={loading} className="text-lg" type="submit" variant="primary">
+        <Button
+          loading={loading}
+          className="text-lg"
+          type="submit"
+          variant="primary"
+        >
           SUBMIT
         </Button>
       </form>

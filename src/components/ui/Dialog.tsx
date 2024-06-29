@@ -1,9 +1,6 @@
-import { deleteDoc, doc } from "firebase/firestore";
 import { useRef } from "react";
-import { auth, db, storage } from "../../firestore";
-import toast from "react-hot-toast";
 import { InfoBook } from "../../utils/type";
-import { ref, deleteObject } from "firebase/storage";
+import { useBook } from "../../context/bookContext";
 
 function Dialog({
   open,
@@ -15,6 +12,7 @@ function Dialog({
   document: InfoBook;
 }) {
   const divNode = useRef<HTMLDivElement>(null);
+  const { deleteBook } = useBook();
 
   const handleClose = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (e.target === divNode.current) {
@@ -22,21 +20,8 @@ function Dialog({
     }
   };
 
-  const handleDelete = async () => {
-    //REMOVE FROM ALL BOOKS
-    try {
-      const imageRef = ref(storage, "images/" + document.imageRef);
-      const fileRef = ref(storage, "files/" + document.fileRef);
-      await deleteObject(imageRef);
-      await deleteObject(fileRef);
-      await deleteDoc(
-        doc(db, `users/${auth.currentUser?.uid}/books`, document.id)
-      );
-      toast.success("This book has been deleted successfully");
-      onClose();
-    } catch (err) {
-      console.log(err);
-    }
+  const handleDelete = () => {
+    deleteBook(document).then(() => onClose());
   };
 
   return (
@@ -52,7 +37,9 @@ function Dialog({
             aria-haspopup="dialog"
             className="p-5 bg-white rounded-lg mx-3 max-w-[550px]"
           >
-            <h2 className="text-lg font-bold mb-5 text-black">Are you absolutely sure?</h2>
+            <h2 className="text-lg font-bold mb-5 text-black">
+              Are you absolutely sure?
+            </h2>
             <p className="mb-5 text-black">
               This action cannot be undone. This will permanently delete this
               book and remove it entirely.

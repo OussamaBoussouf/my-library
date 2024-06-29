@@ -42,6 +42,7 @@ const SelectCategory = ({
       <div ref={divNode} className="relative mt-2">
         <div
           role="select"
+          tabIndex={0}
           onClick={toggleExpand}
           {...register("category", { required: true })}
           className="bg-[#15171c] text-gray-300 capitalize cursor-pointer px-4 py-2 text-sm rounded-md flex justify-between items-center"

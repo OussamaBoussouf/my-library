@@ -10,8 +10,9 @@ import { useRef, useState } from "react";
 import { useClickOutside } from "../../hooks/useClickOutside";
 import { useLocation } from "react-router-dom";
 import { InfoBook } from "../../utils/type";
-import { usePreform } from "../../hooks/usePerform";
+// import { usePreform } from "../../hooks/usePerform";
 import Dialog from "./Dialog";
+import { useBook } from "../../context/bookContext";
 
 const Menu = ({ book }: { book: InfoBook }) => {
   const divNode = useRef<HTMLDivElement | null>(null);
@@ -21,7 +22,7 @@ const Menu = ({ book }: { book: InfoBook }) => {
   const path = useLocation().pathname;
 
   const { moveToTrash, addToFavorite, removeFromFavorite, restoreBook } =
-    usePreform();
+    useBook();
 
   return (
     <div ref={divNode} className="absolute top-0 right-0">

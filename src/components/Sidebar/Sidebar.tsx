@@ -3,6 +3,7 @@ import logo from "../../assets/orange-book.svg";
 //ICONS
 import { Home, Star, Trash, SquarePen } from "lucide-react";
 import { Link, useLocation} from "react-router-dom";
+import { useAuth } from "../../context/authContext";
 
 const sidebarItems = [
   {
@@ -30,6 +31,7 @@ const sidebarItems = [
 function Sidebar() {
 
   const location = useLocation().pathname;
+  const {logOut} = useAuth();
 
   return (
     <div className="text-white py-6 hidden sm:block w-[200px] md:w-[250px] fixed top-0 bottom-0 bg-[#15171c] ">
@@ -50,7 +52,7 @@ function Sidebar() {
           ))}
         </ul>
         <div className="px-6">
-          <Button>Logout</Button>
+          <Button onClick={logOut}>Logout</Button>
         </div>
       </div>
     </div>
