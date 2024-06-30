@@ -45,7 +45,6 @@ export const useUpload = () => {
       if(error) setError("");
       setLoading(false);
     } catch (err) {
-      // console.log(err);
       if (err instanceof FirebaseError) {
         toast.error("Something went wrong");
         console.log(err);

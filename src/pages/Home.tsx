@@ -16,7 +16,6 @@ const title: Record<string, string> = {
 function Home() {
   const { data, loading, isEmpty, hasNoBooks } = useBook();
   const path = useLocation().pathname;
-  console.log(hasNoBooks);
   return (
     <div className="text-white sm:ml-[200px] md:ml-[250px] w-[95vw] max-w-[1000px] p-5 min-h-screen">
       {/* Search bar */}
