@@ -1,4 +1,4 @@
-import { Route, Routes} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
@@ -14,8 +14,7 @@ const Home = lazy(() => import("./pages/Home"));
 const CreateBook = lazy(() => import("./pages/CreateBook"));
 
 function App() {
-  
-  return (
+    return (
     <AuthProvider>
       <Routes>
         <Route element={<Auth />}>
