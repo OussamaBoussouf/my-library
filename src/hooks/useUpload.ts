@@ -41,11 +41,10 @@ export const useUpload = () => {
       const bookRef = doc(db, `users/${auth.currentUser?.uid}/books`, id);
       const docRecord = Object.fromEntries(bookRecord);
       await setDoc(bookRef, docRecord);
-      toast.success("Your book has been download");
+      toast.success("Your book has been downloaded");
       if(error) setError("");
       setLoading(false);
     } catch (err) {
-      // console.log(err);
       if (err instanceof FirebaseError) {
         toast.error("Something went wrong");
         console.log(err);

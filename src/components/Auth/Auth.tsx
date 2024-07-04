@@ -1,13 +1,14 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
 
 function Auth() {
   const { user } = useAuth();
-  const navigate = useNavigate();
+
   if (user) {
-    navigate("-1");
+    history.go(-1);
     return;
   }
+  
   return <Outlet />;
 }
 

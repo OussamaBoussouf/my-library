@@ -1,6 +1,6 @@
 import { ListFilter } from "lucide-react";
 import { useToggle } from "../../hooks/useToggle";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useClickOutside } from "../../hooks/useClickOutside";
 import { useBook } from "../../context/bookContext";
 import { useLocation } from "react-router-dom";
@@ -33,6 +33,11 @@ const Select = () => {
     selectCat(option, path.substring(11));
     toggleExpand();
   };
+
+
+  useEffect(() => {
+    if (selectedCat) setSelectedCat("");
+  }, [path]);
 
   return (
     <>

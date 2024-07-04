@@ -58,20 +58,18 @@ export const useFetch = () => {
         setHasNoBooks(false);
         setLoading(true);
         setData([]);
-        console.log(`Before fetch: ${hasNoBooks}`);
+
         const books: InfoBook[] = [];
         const querySnapshot = await getDocs(dataQuery);
         if (!querySnapshot.empty) {
           querySnapshot.forEach((doc) => {
             books.push(doc.data() as InfoBook);
-            console.log("first");
           });
           setData(books);
           setHasNoBooks(false);
           setCloneData(books);
           setLoading(false);
         } else {
-          console.log("There is no book");
           setHasNoBooks(true);
           setLoading(false);
         }
@@ -149,7 +147,7 @@ export const useFetch = () => {
     if (hasNoBooks) return;
 
     const books: InfoBook[] = cloneData.filter((book) =>
-      book.title.includes(keyword)
+      book.title.includes(keyword.toLowerCase())
     );
 
     if (books.length == 0) {

@@ -1,7 +1,7 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import Input from "../components/ui/Input";
 import InputPassword from "../components/ui/InputPassword";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema } from "../utils/schemaValidator";
 import { UserInfo } from "../utils/type";
@@ -14,7 +14,7 @@ function SignUp() {
     register,
     handleSubmit,
     formState: { errors },
-    watch
+    watch,
   } = useForm<UserInfo>({ resolver: zodResolver(signUpSchema) });
 
   const { signUp, error, resetError, loading } = useAuth();

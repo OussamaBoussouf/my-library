@@ -34,7 +34,9 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [user, setUser] = useState<User | null>(JSON.parse(localStorage.getItem("user") as string) || null);
+  const [user, setUser] = useState<User | null>(
+    JSON.parse(localStorage.getItem("user") as string) || null
+  );
   const navigate = useNavigate();
   const resetError = () => {
     setError("");
@@ -44,7 +46,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
-      // navigate("/dashboard");
       setLoading(false);
     } catch (err) {
       if (err instanceof FirebaseError) {
@@ -60,9 +61,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: "select_account",
-    });
     try {
       const result = await signInWithPopup(auth, provider);
       GoogleAuthProvider.credentialFromResult(result);
@@ -92,6 +90,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         password
       );
       logOut();
+      setLoading(false);
       await updateProfile(credential.user, {
         displayName: username,
       });
@@ -100,14 +99,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         username: username,
       };
       await setDoc(doc(db, "users", credential.user.uid), userRecord);
-      setLoading(false);
       setError("");
-      toast.success("Your account has been created");
-      navigate("/sign-in");
+      toast.success('Your account has been created successfuly');
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code == "auth/email-already-in-use") {
           setError("This email is already used");
+        }
+        else{
+          toast.error('Something went wrong');
         }
         setLoading(false);
       }

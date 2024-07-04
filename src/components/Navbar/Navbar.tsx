@@ -5,7 +5,6 @@ import SidebarMenu from "./SidebarMenu";
 
 function Navbar() {
   const { toggle: open, toggleExpand } = useToggle();
-
   return (
     <nav className="sm:hidden">
       <div className="flex items-center justify-between p-5">

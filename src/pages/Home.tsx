@@ -6,6 +6,7 @@ import { useBook } from "../context/bookContext";
 import search from "../assets/search.svg";
 import oragneBook from "../assets/orange-book.svg";
 import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const title: Record<string, string> = {
   "/dashboard": "All Books",
@@ -16,7 +17,13 @@ const title: Record<string, string> = {
 function Home() {
   const { data, loading, isEmpty, hasNoBooks } = useBook();
   const path = useLocation().pathname;
-  console.log(hasNoBooks);
+
+  useEffect(() => {
+    if (window.scrollY != 0) {
+      window.scrollTo(0, 0);
+    }
+  }, [path]);
+
   return (
     <div className="text-white sm:ml-[200px] md:ml-[250px] w-[95vw] max-w-[1000px] p-5 min-h-screen">
       {/* Search bar */}
@@ -37,7 +44,7 @@ function Home() {
       )}
       {hasNoBooks && (
         <div className="text-center mt-20 flex flex-col items-center">
-          <img className="w-40" src={oragneBook} alt="orange book" />
+          <img className="w-36" src={oragneBook} alt="orange book" />
           <h2 className="text-xl mb-5">There is no book on this section</h2>
         </div>
       )}
