@@ -35,6 +35,8 @@ const InputPassword = forwardRef<HTMLInputElement, InputProps>(function (
               node;
           }
         }}
+        id="password"
+        aria-label="Enter your password here"
         type="password"
         {...props}
         className="w-full mt-2 bg-[#222429] rounded-md py-2 px-3" 

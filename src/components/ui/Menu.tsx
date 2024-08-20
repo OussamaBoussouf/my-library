@@ -10,7 +10,6 @@ import { useRef, useState } from "react";
 import { useClickOutside } from "../../hooks/useClickOutside";
 import { useLocation } from "react-router-dom";
 import { InfoBook } from "../../utils/type";
-// import { usePreform } from "../../hooks/usePerform";
 import Dialog from "./Dialog";
 import { useBook } from "../../context/bookContext";
 

@@ -37,6 +37,7 @@ const SelectCategory = ({
     toggleExpand();
   };
 
+
   return (
     <>
       <div ref={divNode} className="relative mt-2">
