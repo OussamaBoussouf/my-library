@@ -40,7 +40,7 @@ function Login() {
   }, [watch]);
 
   return (
-    <div className="bg-[url('/images/background-library.jpg')] bg-blend-darken h-screen w-full grid place-content-center bg-transparent-black bg-cover bg-center">
+    <div className="bg-[url('/images/background-library.webp')] bg-blend-darken h-screen w-full grid place-content-center bg-transparent-black bg-cover bg-center">
       <div className="bg-black text-white w-[90vw] max-w-[450px] text-center px-10 py-5 rounded-xl">
         <h2 className="font-bold text-xl mb-2">Sign in to libro</h2>
         <p className="text-slate-300">Please sign in to continue</p>
@@ -61,6 +61,7 @@ function Login() {
           <div className="mb-7">
             <label htmlFor="email">Email address</label>
             <Input
+              label="Enter your email"
               {...register("email", { required: true })}
               name="email"
               id="email"
@@ -70,7 +71,7 @@ function Login() {
             </span>
           </div>
           <div className="mb-5">
-            <label htmlFor="email">Password</label>
+            <label htmlFor="password">Password</label>
             <InputPassword {...register("password", { required: true })} />
             <span className="text-red-500">
               {formState.errors.password?.message}

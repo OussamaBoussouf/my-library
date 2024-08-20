@@ -31,6 +31,7 @@ function CreateBook() {
         <div className="mb-10">
           <label htmlFor="title">Book title</label>
           <Input
+            label="Enter book title"
             {...register("title", { required: true })}
             placeholder="Your book title"
           />
@@ -46,6 +47,7 @@ function CreateBook() {
             Book cover
           </label>
           <Input
+            label="Upload book cover"
             {...register("image", { required: true })}
             accept="image/*"
             type="file"
@@ -57,6 +59,7 @@ function CreateBook() {
             Book file
           </label>
           <Input
+            label="Upload pdf file"
             {...register("pdf", { required: true })}
             id="pdf"
             accept="application/pdf"

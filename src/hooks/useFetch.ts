@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { db, storage } from "../firestore";
 import {
   collection,
@@ -124,7 +124,7 @@ export const useFetch = () => {
         books.push(doc.data() as InfoBook);
       });
 
-      // WHENE YOU SELECT CATEGORY THAT HAS NO BOOKS
+      // WHEN YOU SELECT CATEGORY THAT HAS NO BOOKS
       if (books.length == 0) {
         setHasNoBooks(true);
         setLoading(false);
@@ -158,7 +158,7 @@ export const useFetch = () => {
     setData(books);
   };
 
-  const moveToTrash = async (docId: string) => {
+  const moveToTrash = useCallback(async (docId: string) => {
     try {
       const docRef = doc(db, `users/${user?.uid}/books`, docId);
       await updateDoc(docRef, { trash: true, favorite: false });
@@ -168,9 +168,9 @@ export const useFetch = () => {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [data]);
 
-  const addToFavorite = async (docId: string) => {
+  const addToFavorite = useCallback(async (docId: string) => {
     try {
       const docRef = doc(db, `users/${user?.uid}/books`, docId);
       const book = await getDoc(docRef);
@@ -184,9 +184,9 @@ export const useFetch = () => {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, []);
 
-  const removeFromFavorite = async (docId: string) => {
+  const removeFromFavorite = useCallback(async (docId: string) => {
     try {
       const docRef = doc(db, `users/${user?.uid}/books`, docId);
       await updateDoc(docRef, { favorite: false });
@@ -196,21 +196,24 @@ export const useFetch = () => {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [data]);
 
-  const restoreBook = async (docId: string) => {
-    try {
-      const docRef = doc(db, `users/${user?.uid}/books`, docId);
-      await updateDoc(docRef, { trash: false });
-      if (data.length == 1) setHasNoBooks(true);
-      setData((prev) => prev.filter((book) => book.id != docId));
-      toast.success("This book has been restored");
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const restoreBook = useCallback(
+    async (docId: string) => {
+      try {
+        const docRef = doc(db, `users/${user?.uid}/books`, docId);
+        await updateDoc(docRef, { trash: false });
+        if (data.length == 1) setHasNoBooks(true);
+        setData((prev) => prev.filter((book) => book.id != docId));
+        toast.success("This book has been restored");
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [data]
+  );
 
-  const deleteBook = async (document: InfoBook) => {
+  const deleteBook = useCallback(async (document: InfoBook) => {
     try {
       const imageRef = ref(storage, "images/" + document.imageRef);
       const fileRef = ref(storage, "files/" + document.fileRef);
@@ -218,12 +221,13 @@ export const useFetch = () => {
       await deleteObject(fileRef);
       await deleteDoc(doc(db, `users/${user?.uid}/books`, document.id));
       setData((prev) => prev.filter((book) => book.id != document.id));
+      if (data.length == 1) setHasNoBooks(true);
       toast.success("This book has been deleted successfully");
     } catch (err) {
       toast.error("Ops something went wrong");
       console.log(err);
     }
-  };
+  }, [data]);
 
   const value = {
     data,

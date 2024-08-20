@@ -1,17 +1,19 @@
 import React, { Ref, forwardRef } from "react";
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+};
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function (
-  { type, placeholder, ...props },
+  { type, label, ...props },
   ref
 ) {
   return (
     <>
       <input
+      aria-label={label}
         type={type}
         {...props}
-        placeholder={placeholder}
         ref={ref as Ref<HTMLInputElement>}
         className="w-full mt-2 bg-[#222429] rounded-md py-2 px-3"
       />
