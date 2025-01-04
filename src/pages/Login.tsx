@@ -11,7 +11,7 @@ import Button from "../components/ui/Button";
 import { useEffect } from "react";
 
 function Login() {
-  const { register, handleSubmit, formState, watch} =
+  const { register, handleSubmit, formState, setValue, watch } =
     useForm<UserLogin>({
       resolver: zodResolver(logInSchema),
       defaultValues: {
@@ -26,7 +26,15 @@ function Login() {
     login(data.email, data.password);
   };
 
-  //RESETING SERVER ERRORS
+  //HANDLE A DEMO ACCOUNT RQUEST
+  const handleDemoAccountLogin = () => {
+    const data = { email: "admin@admin.com", password: "123456789" };
+    setValue("email", data.email);
+    setValue("password", data.password);
+    onSubmit(data);
+  };
+
+  //RESETTING SERVER ERRORS
   useEffect(() => {
     const subscription = watch(() => {
       if (error != " ") {
@@ -78,6 +86,14 @@ function Login() {
               <span className="text-red-500">{error}</span>
             </span>
           </div>
+          <Button
+            type="button"
+            onClick={handleDemoAccountLogin}
+            variant="secondary"
+            className="mb-3"
+          >
+            Try a demo account
+          </Button>
           <Button loading={loading} type="submit">
             SIGN IN
           </Button>

@@ -1,4 +1,4 @@
-import SingelBook from "../components/Singel-book/SingelBook";
+import SingelBook from "../components/Single-book/SingleBook";
 import SearchInput from "../components/ui/SearchInput";
 import Select from "../components/ui/Select";
 import Skeleton from "../components/ui/Skeleton";
@@ -15,7 +15,7 @@ const title: Record<string, string> = {
 };
 
 function Home() {
-  const { data, loading, isEmpty, hasNoBooks } = useBook();
+  const { data, isEmpty, hasNoBooks, loading } = useBook();
   const path = useLocation().pathname;
 
   useEffect(() => {
@@ -33,6 +33,7 @@ function Home() {
         <h2 className="text-xl md:text-3xl font-roboto-bold">{title[path]}</h2>
         <Select />
       </div>
+      {/* If there is no result after searching */}
       {isEmpty && (
         <div className="text-center mt-20 flex flex-col items-center">
           <img className="mb-10 w-52" src={search} alt="search icon" />
@@ -42,6 +43,7 @@ function Home() {
           </p>
         </div>
       )}
+      {/* No book exists in this applied filter */}
       {hasNoBooks && (
         <div className="text-center mt-20 flex flex-col items-center">
           <img className="w-36" src={oragneBook} alt="orange book" />

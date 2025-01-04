@@ -29,3 +29,24 @@
   }
 }
 
+@layer components {
+
+  @keyframes slideSkeletonBg {
+    to {
+      background-position-x: -250%;
+    }
+  }
+  
+  .skeleton-loader {
+    background-color: gainsboro;
+    background-image: linear-gradient(
+      -80deg,
+      transparent 40%,
+      white 50%,
+      transparent 60%
+    );
+    background-size: 200%;
+    background-position-x: -50%;
+    animation: slideSkeletonBg 2s linear forwards infinite;
+  }
+}

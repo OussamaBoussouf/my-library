@@ -14,7 +14,7 @@ const buttonVariants = cva(
       variant: {
         primary:
           "hover:opacity-90 bg-orange-500 w-full py-3 text-sm rounded-md disabled:opacity-45",
-        secondary: "text-black hover:text-indigo-500",
+        secondary: "hover:bg-orange-400 border-orange-500 border-[2px] w-full py-3 text-sm rounded-md",
       },
     },
     defaultVariants: {

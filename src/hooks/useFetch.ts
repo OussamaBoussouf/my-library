@@ -26,6 +26,7 @@ export const useFetch = () => {
   const location = useLocation().pathname;
 
   let dataQuery;
+
   switch (location) {
     case "/dashboard/favorite":
       dataQuery = query(
@@ -158,17 +159,20 @@ export const useFetch = () => {
     setData(books);
   };
 
-  const moveToTrash = useCallback(async (docId: string) => {
-    try {
-      const docRef = doc(db, `users/${user?.uid}/books`, docId);
-      await updateDoc(docRef, { trash: true, favorite: false });
-      if (data.length == 1) setHasNoBooks(true);
-      setData((prev) => prev.filter((book) => book.id != docId));
-      toast.success("This book has been moved to trash");
-    } catch (err) {
-      console.log(err);
-    }
-  }, [data]);
+  const moveToTrash = useCallback(
+    async (docId: string) => {
+      try {
+        const docRef = doc(db, `users/${user?.uid}/books`, docId);
+        await updateDoc(docRef, { trash: true, favorite: false });
+        if (data.length == 1) setHasNoBooks(true);
+        setData((prev) => prev.filter((book) => book.id != docId));
+        toast.success("This book has been moved to trash");
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [data]
+  );
 
   const addToFavorite = useCallback(async (docId: string) => {
     try {
@@ -186,17 +190,20 @@ export const useFetch = () => {
     }
   }, []);
 
-  const removeFromFavorite = useCallback(async (docId: string) => {
-    try {
-      const docRef = doc(db, `users/${user?.uid}/books`, docId);
-      await updateDoc(docRef, { favorite: false });
-      if (data.length == 1) setHasNoBooks(true);
-      setData((prev) => prev.filter((book) => book.id != docId));
-      toast.success("This book has been removed from favorite");
-    } catch (err) {
-      console.log(err);
-    }
-  }, [data]);
+  const removeFromFavorite = useCallback(
+    async (docId: string) => {
+      try {
+        const docRef = doc(db, `users/${user?.uid}/books`, docId);
+        await updateDoc(docRef, { favorite: false });
+        if (data.length == 1) setHasNoBooks(true);
+        setData((prev) => prev.filter((book) => book.id != docId));
+        toast.success("This book has been removed from favorite");
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [data]
+  );
 
   const restoreBook = useCallback(
     async (docId: string) => {
@@ -213,21 +220,24 @@ export const useFetch = () => {
     [data]
   );
 
-  const deleteBook = useCallback(async (document: InfoBook) => {
-    try {
-      const imageRef = ref(storage, "images/" + document.imageRef);
-      const fileRef = ref(storage, "files/" + document.fileRef);
-      await deleteObject(imageRef);
-      await deleteObject(fileRef);
-      await deleteDoc(doc(db, `users/${user?.uid}/books`, document.id));
-      setData((prev) => prev.filter((book) => book.id != document.id));
-      if (data.length == 1) setHasNoBooks(true);
-      toast.success("This book has been deleted successfully");
-    } catch (err) {
-      toast.error("Ops something went wrong");
-      console.log(err);
-    }
-  }, [data]);
+  const deleteBook = useCallback(
+    async (document: InfoBook) => {
+      try {
+        const imageRef = ref(storage, "images/" + document.imageRef);
+        const fileRef = ref(storage, "files/" + document.fileRef);
+        await deleteObject(imageRef);
+        await deleteObject(fileRef);
+        await deleteDoc(doc(db, `users/${user?.uid}/books`, document.id));
+        setData((prev) => prev.filter((book) => book.id != document.id));
+        if (data.length == 1) setHasNoBooks(true);
+        toast.success("This book has been deleted successfully");
+      } catch (err) {
+        toast.error("Ops something went wrong");
+        console.log(err);
+      }
+    },
+    [data]
+  );
 
   const value = {
     data,

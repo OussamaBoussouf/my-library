@@ -15,6 +15,7 @@ function SingelBook({ book }: { book: InfoBook }) {
         alt="book cover"
         height={336}
         width={210}
+        className="w-full"
       />
       <h2 className="my-3 text-lg capitalize">{book.title}</h2>
       {path === "/dashboard/trash" ? null : (
