@@ -15,8 +15,9 @@ export default {
         "fill": "repeat(auto-fill,minmax(240px, 1fr))"
       },
       backgroundColor:{
-        "transparent-black": 'rgba(0, 0, 0, 0.5)'
-      }
+        "transparent-black": "rgba(0, 0, 0, 0.5)",
+        "light-dark": "#222429"
+      },
     },
   },
   plugins: [],

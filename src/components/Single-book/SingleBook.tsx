@@ -1,10 +1,10 @@
 import Button from "../ui/Button";
 import Menu from "../ui/Menu";
-import { InfoBook } from "../../utils/type";
 import { Link, useLocation } from "react-router-dom";
 import { imagekitUrl } from "../../utils/imagekitUrl";
+import { DocumentData } from "firebase/firestore";
 
-function SingelBook({ book }: { book: InfoBook }) {
+function SingelBook({ book }: { book: DocumentData }) {
   const path = useLocation().pathname;
 
   return (
@@ -13,14 +13,13 @@ function SingelBook({ book }: { book: InfoBook }) {
       <img
         src={imagekitUrl(book.imageUrl)}
         alt="book cover"
-        height={336}
+        height={330}
         width={210}
         className="w-full"
       />
-      <h2 className="my-3 text-lg capitalize">{book.title}</h2>
       {path === "/dashboard/trash" ? null : (
         <Link to={`${book.fileUrl}`} target="_blank">
-          <Button>Read now</Button>
+          <Button className="mt-5">Read now</Button>
         </Link>
       )}
     </div>

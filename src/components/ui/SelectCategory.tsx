@@ -52,7 +52,7 @@ const SelectCategory = ({
           <ChevronDown />
         </div>
         {isOpen && (
-          <ul className="max-h-[176px] overflow-auto w-[100%] absolute z-10 top-[120%] right-0 bg-[#15171c] py-2 rounded-md">
+          <ul className="thin-scrollbar max-h-[176px] overflow-auto w-[100%] absolute z-10 top-[120%] right-0 bg-[#15171c] py-2 rounded-md">
             {options.map((option, index) => (
               <li
                 role="option"

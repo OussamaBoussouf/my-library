@@ -1,6 +1,8 @@
 import { useRef } from "react";
-import { InfoBook } from "../../utils/type";
-import { useBook } from "../../context/bookContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteBook } from "../../services/book-api";
+import toast from "react-hot-toast";
+import { DocumentData } from "firebase/firestore";
 
 function Dialog({
   open,
@@ -9,10 +11,11 @@ function Dialog({
 }: {
   open: boolean;
   onClose: () => void;
-  document: InfoBook;
+  document: DocumentData;
 }) {
   const divNode = useRef<HTMLDivElement>(null);
-  const { deleteBook } = useBook();
+
+  const queryClient = useQueryClient();
 
   const handleClose = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (e.target === divNode.current) {
@@ -20,9 +23,17 @@ function Dialog({
     }
   };
 
-  const handleDelete = () => {
-    deleteBook(document).then(() => onClose());
-  };
+  const handleDelete = useMutation({
+    mutationFn: deleteBook,
+    onSuccess: () => {
+      toast.success("Book has been deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["trash"] });
+      onClose();
+    },
+    onError: () => {
+      toast.error("Something went wrong we couldn't delete this book ");
+    },
+  });
 
   return (
     <>
@@ -53,7 +64,9 @@ function Dialog({
                 Cancel
               </button>
               <button
-                onClick={() => handleDelete()}
+                onClick={() => {
+                  handleDelete.mutate(document);
+                }}
                 type="button"
                 className="ms-5 bg-red-500 rounded-md py-2 px-5 text-white hover:opacity-80"
               >

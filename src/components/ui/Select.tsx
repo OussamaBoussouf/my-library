@@ -1,70 +1,156 @@
-import { ListFilter } from "lucide-react";
-import { useToggle } from "../../hooks/useToggle";
-import { useEffect, useRef, useState } from "react";
-import { useClickOutside } from "../../hooks/useClickOutside";
-import { useBook } from "../../context/bookContext";
-import { useLocation } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-const options = [
-  "all",
-  "fantasy",
-  "mystery",
-  "romance",
-  "adventure",
-  "horror",
-  "science fiction",
-  "historical fiction",
-  "humor",
-  "biography",
-  "coding",
-  "other",
-];
+type SelectContextType = {
+  selectedValue: string;
+  setSelectedValue: React.Dispatch<React.SetStateAction<string>>;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onChange: (value: string) => void;
+};
 
-const Select = () => {
-  const { toggle: isOpen, toggleExpand } = useToggle();
-  const [selectedCat, setSelectedCat] = useState("");
-  const divNode = useRef<HTMLDivElement | null>(null);
-  const path = useLocation().pathname;
-  const { selectCat } = useBook();
-  useClickOutside(divNode, toggleExpand, isOpen);
+const SelectContext = createContext<SelectContextType | null>(null);
 
-  const handleSelect = (option: string) => {
-    setSelectedCat(option);
-    selectCat(option, path.substring(11));
-    toggleExpand();
+type SelectProps = {
+  children: ReactNode;
+  onChange: (value: string) => void;
+};
+
+function Select({ onChange, children }: SelectProps) {
+  const [selectedValue, setSelectedValue] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <SelectContext.Provider
+      value={{ selectedValue, setSelectedValue, isOpen, setIsOpen, onChange }}
+    >
+      <div className="relative">{children}</div>
+    </SelectContext.Provider>
+  );
+}
+
+const Icon = ({
+  children,
+  className,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) => {
+  return <div className={className}>{children}</div>;
+};
+
+Select.Icon = Icon;
+
+const Trigger = ({
+  children,
+  placeholder,
+  className,
+}: {
+  children: ReactNode;
+  placeholder: string;
+  className?: string;
+}) => {
+  const { selectedValue, isOpen, setIsOpen } = useSelectContext();
+  return (
+    <button
+      onClick={() => setIsOpen(!isOpen)}
+      className={`min-w-[200px] bg-light-dark text-white py-2 px-3 rounded-lg flex justify-between items-center gap-2 ${className}`}
+    >
+      <div className="flex items-center">
+        {children} {selectedValue ? selectedValue : placeholder}
+      </div>
+      <ChevronDown size={20} />
+    </button>
+  );
+};
+
+Select.Trigger = Trigger;
+
+
+
+const SelectGroup = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => {
+  const { isOpen, setIsOpen } = useSelectContext();
+
+  const ulRef = useRef<HTMLUListElement | null>(null);
+
+  const handleClickOutside = (e: MouseEvent) => {
+    if (ulRef.current !== null && !ulRef.current?.contains(e.target as Node)) {
+      setIsOpen(false);
+    }
   };
 
-
   useEffect(() => {
-    if (selectedCat) setSelectedCat("");
-  }, [path]);
+    if (isOpen) document.addEventListener("mouseup", handleClickOutside);
+
+    return () => document.removeEventListener("mouseup", handleClickOutside);
+  }, [isOpen]);
 
   return (
     <>
-      <div ref={divNode} className="relative">
-        <div
-          onClick={toggleExpand}
-          className="bg-[#15171c] capitalize cursor-pointer px-4 py-2 text-sm rounded-md flex justify-between items-center"
+      {isOpen && (
+        <ul
+          ref={ulRef}
+          className={`thin-scrollbar absolute z-10 top-[100%] w-full mt-2 bg-light-dark overflow-hidden rounded-lg ${className}`}
         >
-          <ListFilter className="me-2" />
-          {selectedCat != "" ? selectedCat : "Apply filter"}
-        </div>
-        {isOpen && (
-          <ul className="max-h-[176px] overflow-auto absolute z-10 top-[120%] right-0 bg-[#15171c] py-2 rounded-md w-[150px]">
-            {options.map((option, index) => (
-              <li
-                key={index}
-                onClick={() => handleSelect(option)}
-                className="capitalize px-3 py-2 cursor-pointer hover:bg-orange-400 hover:text-black"
-              >
-                {option}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+          {children}
+        </ul>
+      )}
     </>
   );
 };
 
-export default Select;
+Select.SelectGroup = SelectGroup;
+
+
+
+const SelectItem = ({
+  value,
+  className,
+}: {
+  value: string;
+  className?: string;
+}) => {
+  const { setSelectedValue, setIsOpen, onChange } = useSelectContext();
+  return (
+    <li role="option">
+      <button
+        className={`py-1 px-2 hover:bg-orange-500 hover:text-black text-white w-full text-start ${className}`}
+        onClick={() => {
+          setSelectedValue(value);
+          onChange(value);
+          setIsOpen(false);
+        }}
+      >
+        {value}
+      </button>
+    </li>
+  );
+};
+
+Select.SelectItem = SelectItem;
+
+export { Select, Icon, Trigger, SelectItem, SelectGroup };
+
+const useSelectContext = () => {
+  const context = useContext(SelectContext);
+
+  if (!context) {
+    throw new Error(
+      "the useSelectContext should be used within a Select component"
+    );
+  }
+
+  return context;
+};
