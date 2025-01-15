@@ -48,7 +48,7 @@ function Login() {
   }, [watch]);
 
   return (
-    <div className="bg-[url('/images/background-library.webp')] bg-blend-darken h-screen w-full grid place-content-center bg-transparent-black bg-cover bg-center">
+    <div className="bg-[url('/images/background-library.webp')] bg-blend-darken min-h-screen w-full grid place-content-center bg-transparent-black bg-cover bg-center">
       <div className="bg-black text-white w-[90vw] max-w-[450px] text-center px-10 py-5 rounded-xl">
         <h2 className="font-bold text-xl mb-2">Sign in to libro</h2>
         <p className="text-slate-300">Please sign in to continue</p>

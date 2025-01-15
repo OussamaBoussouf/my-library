@@ -4,7 +4,7 @@ import { deleteBook } from "../../services/book-api";
 import toast from "react-hot-toast";
 import { DocumentData } from "firebase/firestore";
 
-function Dialog({
+function DeleteDialog({
   open,
   onClose,
   document,
@@ -64,13 +64,14 @@ function Dialog({
                 Cancel
               </button>
               <button
+                disabled={handleDelete.isPending}
                 onClick={() => {
                   handleDelete.mutate(document);
                 }}
                 type="button"
                 className="ms-5 bg-red-500 rounded-md py-2 px-5 text-white hover:opacity-80"
               >
-                Delete
+                {handleDelete.isPending ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
@@ -80,4 +81,4 @@ function Dialog({
   );
 }
 
-export default Dialog;
+export default DeleteDialog;

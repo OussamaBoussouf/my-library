@@ -5,8 +5,8 @@ import Skeleton from "../components/ui/Skeleton";
 import { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import EmptySearch from "../components/ui/EmptySearch";
-import { CircleX, FileText } from "lucide-react";
 import EmptySection from "../components/ui/EmptySection";
+import { useAuth } from "../context/authContext";
 
 function DashboardFavorite() {
   const { searchedValue, selectedFilter } = useOutletContext<{
@@ -14,9 +14,11 @@ function DashboardFavorite() {
     selectedFilter: string;
   }>();
 
+  const { user } = useAuth();
+
   let { data, isLoading } = useQuery({
     queryKey: ["favorite"],
-    queryFn: getFavoriteBooks,
+    queryFn: () => getFavoriteBooks(user),
   });
 
   const books = useMemo(
@@ -42,13 +44,11 @@ function DashboardFavorite() {
   }
 
   if (selectedFilter !== "" && books?.length === 0) {
-    return <EmptySection/>;
+    return <EmptySection />;
   }
 
   if (books?.length === 0) {
-    return (
-      <EmptySection/>
-    );
+    return <EmptySection />;
   }
 
   return (

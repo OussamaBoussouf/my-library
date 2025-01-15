@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Select } from "../components/ui/Select";
 import SearchInput from "../components/ui/SearchInput";
-import { Filter } from "lucide-react";
+
 import { selectOptions } from "../constants/constant";
 import { Outlet, useLocation } from "react-router-dom";
 import { useDebounce } from "../hooks/useDebounce";
+import { Select } from "../components/ui/Select";
 
 const title: Record<string, string> = {
   "/dashboard": "All Books",
@@ -14,7 +14,6 @@ const title: Record<string, string> = {
 
 function SearchFilterLayout() {
   const path = useLocation().pathname;
-
   const [selectedFilter, setSelectedFilter] = useState("");
   const [searchedValue, setSearchedValue] = useState("");
 
@@ -27,11 +26,7 @@ function SearchFilterLayout() {
         <h2 className="text-xl md:text-3xl font-roboto-bold">{title[path]}</h2>
         {/* <Select /> */}
         <Select onChange={(value: string) => setSelectedFilter(value)}>
-          <Select.Trigger placeholder="Select filter...">
-            <Select.Icon className="me-2">
-              <Filter size="20" />
-            </Select.Icon>
-          </Select.Trigger>
+          <Select.Trigger placeholder="Filter by" />
           <Select.SelectGroup className="overflow-y-auto max-h-[200px]">
             {selectOptions.map((option, index) => (
               <Select.SelectItem key={index} value={option} />

@@ -46,16 +46,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
-      setLoading(false);
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code === "auth/invalid-credential") {
           setError(
             "This credential doesn't exist or the password is incorrect"
           );
-          setLoading(false);
         }
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,8 +89,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password
       );
-      logOut();
-      setLoading(false);
       await updateProfile(credential.user, {
         displayName: username,
       });
@@ -100,17 +98,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
       await setDoc(doc(db, "users", credential.user.uid), userRecord);
       setError("");
-      toast.success('Your account has been created successfuly');
+      toast.success("Your account has been created successfuly");
     } catch (err) {
       if (err instanceof FirebaseError) {
         if (err.code == "auth/email-already-in-use") {
           setError("This email is already used");
+        } else {
+          toast.error("Something went wrong");
         }
-        else{
-          toast.error('Something went wrong');
-        }
-        setLoading(false);
       }
+    } finally {
+      setLoading(false);
     }
   };
 

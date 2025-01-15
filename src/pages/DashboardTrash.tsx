@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import EmptySearch from "../components/ui/EmptySearch";
 import EmptySection from "../components/ui/EmptySection";
+import { useAuth } from "../context/authContext";
 
 function DashboardTrash() {
   const { searchedValue, selectedFilter } = useOutletContext<{
@@ -13,9 +14,11 @@ function DashboardTrash() {
     selectedFilter: string;
   }>();
 
+  const { user } = useAuth();
+
   let { data, isLoading } = useQuery({
     queryKey: ["trash"],
-    queryFn: getBooksInTrash,
+    queryFn: () => getBooksInTrash(user),
   });
 
   const books = useMemo(
@@ -41,7 +44,7 @@ function DashboardTrash() {
   }
 
   if (selectedFilter !== "" && books?.length === 0) {
-    return <EmptySection/>;
+    return <EmptySection />;
   }
 
   if (books?.length === 0) {

@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import Skeleton from "../components/ui/Skeleton";
 import EmptySearch from "../components/ui/EmptySearch";
 import EmptySection from "../components/ui/EmptySection";
+import { useAuth } from "../context/authContext";
 
 function DashboardHome() {
   const { searchedValue, selectedFilter } = useOutletContext<{
@@ -14,9 +15,11 @@ function DashboardHome() {
     selectedFilter: string;
   }>();
 
+  const {user} = useAuth();
+
   let { data, isLoading } = useQuery({
     queryKey: ["all"],
-    queryFn: getAllBooks,
+    queryFn: () => getAllBooks(user),
   });
 
   const books = useMemo(
@@ -26,8 +29,6 @@ function DashboardHome() {
         .filter((book) => book.title.includes(searchedValue.toLowerCase())),
     [searchedValue, selectedFilter, data]
   );
-
-  console.log(books);
 
   if (isLoading) {
     return (
@@ -53,7 +54,7 @@ function DashboardHome() {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-10 gap-x-10">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
         {books && books.map((book) => <SingelBook key={book.id} book={book} />)}
       </div>
     </>

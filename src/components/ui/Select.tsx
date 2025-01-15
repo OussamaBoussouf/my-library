@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import React, {
   createContext,
+  forwardRef,
   ReactNode,
   useContext,
   useEffect,
@@ -20,73 +21,23 @@ const SelectContext = createContext<SelectContextType | null>(null);
 
 type SelectProps = {
   children: ReactNode;
+  className?: string;
   onChange: (value: string) => void;
 };
 
-function Select({ onChange, children }: SelectProps) {
+const SelectRoot = forwardRef<HTMLDivElement, SelectProps>((props, ref) => {
+  const { children, onChange, className } = props;
+
   const [selectedValue, setSelectedValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  return (
-    <SelectContext.Provider
-      value={{ selectedValue, setSelectedValue, isOpen, setIsOpen, onChange }}
-    >
-      <div className="relative">{children}</div>
-    </SelectContext.Provider>
-  );
-}
 
-const Icon = ({
-  children,
-  className,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => {
-  return <div className={className}>{children}</div>;
-};
-
-Select.Icon = Icon;
-
-const Trigger = ({
-  children,
-  placeholder,
-  className,
-}: {
-  children: ReactNode;
-  placeholder: string;
-  className?: string;
-}) => {
-  const { selectedValue, isOpen, setIsOpen } = useSelectContext();
-  return (
-    <button
-      onClick={() => setIsOpen(!isOpen)}
-      className={`min-w-[200px] bg-light-dark text-white py-2 px-3 rounded-lg flex justify-between items-center gap-2 ${className}`}
-    >
-      <div className="flex items-center">
-        {children} {selectedValue ? selectedValue : placeholder}
-      </div>
-      <ChevronDown size={20} />
-    </button>
-  );
-};
-
-Select.Trigger = Trigger;
-
-
-
-const SelectGroup = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => {
-  const { isOpen, setIsOpen } = useSelectContext();
-
-  const ulRef = useRef<HTMLUListElement | null>(null);
+  const divRef = useRef<HTMLDivElement | null>(null);
 
   const handleClickOutside = (e: MouseEvent) => {
-    if (ulRef.current !== null && !ulRef.current?.contains(e.target as Node)) {
+    if (
+      divRef.current !== null &&
+      !divRef.current?.contains(e.target as Node)
+    ) {
       setIsOpen(false);
     }
   };
@@ -98,11 +49,62 @@ const SelectGroup = ({
   }, [isOpen]);
 
   return (
+    <SelectContext.Provider
+      value={{ selectedValue, setSelectedValue, isOpen, setIsOpen, onChange }}
+    >
+      <div ref={divRef} role="select" className={`relative ${className ?? ""}`}>
+        {children}
+      </div>
+    </SelectContext.Provider>
+  );
+});
+
+const Icon = ({
+  children,
+  className,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) => {
+  return <div className={className}>{children}</div>;
+};
+
+const Trigger = ({
+  placeholder,
+  className,
+}: {
+  placeholder: string;
+  className?: string;
+}) => {
+  const { selectedValue, isOpen, setIsOpen } = useSelectContext();
+  return (
+    <button
+      type="button"
+      onClick={() => setIsOpen(!isOpen)}
+      className={`min-w-[200px] bg-light-dark text-white py-2 px-3 rounded-lg flex justify-between items-center gap-2 ${className}`}
+    >
+      <div className="flex items-center">
+        {selectedValue ? selectedValue : placeholder}
+      </div>
+      <ChevronDown size={20} />
+    </button>
+  );
+};
+
+const SelectGroup = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => {
+  const { isOpen } = useSelectContext();
+
+  return (
     <>
       {isOpen && (
         <ul
-          ref={ulRef}
-          className={`thin-scrollbar absolute z-10 top-[100%] w-full mt-2 bg-light-dark overflow-hidden rounded-lg ${className}`}
+          className={`thin-scrollbar absolute z-10 top-[100%] w-full mt-2 p-1 bg-light-dark overflow-hidden rounded-lg ${className}`}
         >
           {children}
         </ul>
@@ -110,10 +112,6 @@ const SelectGroup = ({
     </>
   );
 };
-
-Select.SelectGroup = SelectGroup;
-
-
 
 const SelectItem = ({
   value,
@@ -126,7 +124,8 @@ const SelectItem = ({
   return (
     <li role="option">
       <button
-        className={`py-1 px-2 hover:bg-orange-500 hover:text-black text-white w-full text-start ${className}`}
+        type="button"
+        className={`py-1 px-2 hover:bg-light-gray rounded-lg text-white w-full text-start ${className}`}
         onClick={() => {
           setSelectedValue(value);
           onChange(value);
@@ -139,9 +138,12 @@ const SelectItem = ({
   );
 };
 
-Select.SelectItem = SelectItem;
-
-export { Select, Icon, Trigger, SelectItem, SelectGroup };
+export const Select = Object.assign(SelectRoot, {
+  Trigger,
+  Icon,
+  SelectItem,
+  SelectGroup,
+});
 
 const useSelectContext = () => {
   const context = useContext(SelectContext);

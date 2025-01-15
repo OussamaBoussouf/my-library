@@ -2,36 +2,37 @@ import Button from "../ui/Button";
 import logo from "../../assets/orange-book.svg";
 //ICONS
 import { Home, Star, Trash, SquarePen } from "lucide-react";
-import { Link, useLocation} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 const sidebarItems = [
   {
     icon: <Home color="#737477" />,
     text: "Home",
-    url: "/dashboard"
+    url: "/dashboard",
   },
   {
     icon: <Star color="#737477" />,
     text: "Favorite",
-    url: "/dashboard/favorite"
+    url: "/dashboard/favorite",
   },
   {
     icon: <Trash color="#737477" />,
     text: "Trash",
-    url: "/dashboard/trash"
+    url: "/dashboard/trash",
   },
   {
     icon: <SquarePen color="#737477" />,
     text: "Create New Book",
-    url: "/dashboard/create-book"
+    url: "/dashboard/create-book",
   },
 ];
 
 function Sidebar() {
-
+  const queryClient = useQueryClient();
   const location = useLocation().pathname;
-  const {logOut} = useAuth();
+  const { logOut } = useAuth();
 
   return (
     <div className="text-white py-6 hidden sm:block w-[200px] md:w-[250px] fixed top-0 bottom-0 bg-[#15171c] ">
@@ -44,7 +45,11 @@ function Sidebar() {
           {sidebarItems.map((item, index) => (
             <Link key={index} to={item.url}>
               <li
-                className={`${location == item.url ? "bg-gradient-to-r from-[#232529] to-[#17191e] border-r-4 border-orange-500 text-white" : ""} hover:bg-gradient-to-r from-[#232529] to-[#17191e] hover:border-r-4 hover:border-orange-500 hover:text-white text-sm md:text-base cursor-pointer px-6 py-4 flex items-center gap-4`}
+                className={`${
+                  location == item.url
+                    ? "bg-gradient-to-r from-[#232529] to-[#17191e] border-r-4 border-orange-500 text-white"
+                    : ""
+                } hover:bg-gradient-to-r from-[#232529] to-[#17191e] hover:border-r-4 hover:border-orange-500 hover:text-white text-sm md:text-base cursor-pointer px-6 py-4 flex items-center gap-4`}
               >
                 {item.icon} {item.text}
               </li>
@@ -52,7 +57,14 @@ function Sidebar() {
           ))}
         </ul>
         <div className="px-6">
-          <Button onClick={logOut}>Logout</Button>
+          <Button
+            onClick={() => {
+              queryClient.clear();
+              logOut();
+            }}
+          >
+            Logout
+          </Button>
         </div>
       </div>
     </div>

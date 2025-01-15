@@ -5,7 +5,10 @@ export interface Data {
 }
 
 export interface IBook {
-  [index: string]: string | FileList;
+  pdf: FileList;
+  image: FileList;
+  title: string;
+  category: string;
 }
 
 export interface User {
