@@ -25,7 +25,7 @@ type SelectProps = {
   onChange: (value: string) => void;
 };
 
-const SelectRoot = forwardRef<HTMLDivElement, SelectProps>((props, ref) => {
+const SelectRoot = forwardRef<HTMLDivElement, SelectProps>((props) => {
   const { children, onChange, className } = props;
 
   const [selectedValue, setSelectedValue] = useState("");
