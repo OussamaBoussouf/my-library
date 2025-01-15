@@ -1,25 +1,18 @@
+import { DocumentData } from "firebase/firestore";
+
 export interface Data {
   [index: string]: string | FileList | number;
 }
 
 export interface IBook {
-  [index: string]: string | FileList;
+  pdf: FileList;
+  image: FileList;
+  title: string;
+  category: string;
 }
 
 export interface User {
   uid: string;
-}
-
-export interface InfoBook {
-  id: string;
-  fileRef: string;
-  fileUrl: string;
-  imageUrl: string;
-  imageRef: string;
-  title: string;
-  favorite: boolean;
-  trash: boolean;
-  category: string;
 }
 
 export interface UserInfo {
@@ -45,7 +38,7 @@ export interface Context {
 }
 
 export interface IBookContext {
-  data: InfoBook[];
+  data: DocumentData[];
   selectCat: (category: string, type: string) => void;
   search: (keyword: string) => void;
   loading: boolean;
@@ -55,5 +48,5 @@ export interface IBookContext {
   addToFavorite: (docId: string) => Promise<void>;
   removeFromFavorite: (docId: string) => Promise<void>;
   restoreBook: (docId: string) => Promise<void>;
-  deleteBook: (doc: InfoBook) => Promise<void>;
+  deleteBook: (doc: DocumentData) => Promise<void>;
 }

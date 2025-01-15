@@ -1,27 +1,38 @@
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
-import SelectCategory from "../components/ui/SelectCategory";
 import { IBook } from "../utils/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uploadBookSchema } from "../utils/schemaValidator";
-import { useUpload } from "../hooks/useUpload";
+import { Select } from "../components/ui/Select";
+import { selectOptions } from "../constants/constant";
+import { uploadBook } from "../services/book-api";
+import toast from "react-hot-toast";
+import { useState } from "react";
 
 function CreateBook() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
     reset,
+    control,
   } = useForm<IBook>({ resolver: zodResolver(uploadBookSchema) });
 
-  const { error, loading, upload } = useUpload();
+  const [loading, setLoading] = useState(false);
 
   const onSubmit: SubmitHandler<IBook> = async (data: IBook) => {
-    upload(data).then(() => {
-      if (!error) reset();
-    });
+    setLoading(true);
+    try {
+      await uploadBook(data);
+      toast.success("The book has been downloaded successfully");
+      reset();
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong we could not upload this book");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,7 +50,28 @@ function CreateBook() {
         </div>
         <div className="mb-10">
           <label htmlFor="category">Category</label>
-          <SelectCategory register={register} setValue={setValue} />
+          <Controller
+            control={control}
+            name="category"
+            render={({ field }) => (
+              <Select
+                {...field}
+                onChange={(value) => field.onChange(value)}
+                className="mt-2"
+              >
+                <Select.Trigger
+                  className="w-full"
+                  placeholder="Select category"
+                />
+                <Select.SelectGroup className="overflow-y-auto max-h-[200px]">
+                  {selectOptions.map((option, index) => (
+                    <Select.SelectItem key={index} value={option} />
+                  ))}
+                </Select.SelectGroup>
+              </Select>
+            )}
+          />
+
           <span className="text-red-500">{errors.category?.message}</span>
         </div>
         <div className="mb-10">

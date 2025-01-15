@@ -1,97 +1,156 @@
 import {
-  ArchiveRestore,
-  EllipsisVertical,
-  Star,
-  StarHalf,
-  Trash,
-} from "lucide-react";
-import { useToggle } from "../../hooks/useToggle";
-import { useRef, useState } from "react";
-import { useClickOutside } from "../../hooks/useClickOutside";
-import { useLocation } from "react-router-dom";
-import { InfoBook } from "../../utils/type";
-import Dialog from "./Dialog";
-import { useBook } from "../../context/bookContext";
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
-const Menu = ({ book }: { book: InfoBook }) => {
-  const divNode = useRef<HTMLDivElement | null>(null);
-  const { toggle: isOpen, toggleExpand } = useToggle();
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  useClickOutside(divNode, toggleExpand, isOpen);
-  const path = useLocation().pathname;
+type MenuContextType = {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-  const { moveToTrash, addToFavorite, removeFromFavorite, restoreBook } =
-    useBook();
+const MenuContext = createContext<MenuContextType | null>(null);
 
+type MenuProps = {
+  children: ReactNode;
+  className?: string;
+};
+
+export default function Menu({ children, className }: MenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const divRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClickOutside = (e: MouseEvent) => {
+    if (
+      divRef.current !== null &&
+      !divRef.current?.contains(e.target as Node)
+    ) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) document.addEventListener("mouseup", handleClickOutside);
+
+    return () => document.removeEventListener("mouseup", handleClickOutside);
+  }, [isOpen]);
   return (
-    <div ref={divNode} className="absolute top-0 right-0">
-      <button
-        onClick={toggleExpand}
-        type="button"
-        className="bg-slate-400 p-1"
-      >
-        <EllipsisVertical />
-      </button>
-      {isOpen && (
-        <div className="absolute py-3 rounded-md bg-[#26262e] top-[40px] right-0">
-          {path == "/dashboard" ? (
-            <div className="w-[160px] ">
-              <div
-                onClick={() => {
-                  addToFavorite(book.id).finally(() => toggleExpand());
-                }}
-                className="flex items-center cursor-pointer gap-2 px-3 py-2 hover:text-black text-white hover:bg-orange-400"
-              >
-                <Star /> <span>Favorite</span>
-              </div>
-              <div
-                onClick={() => {
-                  moveToTrash(book.id).finally(() => toggleExpand());
-                }}
-                className="flex items-center cursor-pointer gap-2 px-3 py-2 hover:text-black text-white hover:bg-orange-400"
-              >
-                <Trash /> <span>Move to trash</span>
-              </div>
-            </div>
-          ) : path == "/dashboard/favorite" ? (
-            <div
-              onClick={() => {
-                removeFromFavorite(book.id).finally(() => toggleExpand());
-              }}
-              className="flex items-center cursor-pointer gap-2 px-3 py-2 hover:text-black text-white hover:bg-orange-400"
-            >
-              <StarHalf /> <span>Unfavorite</span>
-            </div>
-          ) : (
-            <div className="w-[150px]">
-              <div
-                onClick={() => {
-                  restoreBook(book.id).finally(() => toggleExpand());
-                }}
-                className="flex items-center cursor-pointer gap-2 px-3 py-2 hover:text-black text-white hover:bg-orange-400"
-              >
-                <ArchiveRestore /> <span>Restore</span>
-              </div>
-              <div
-                onClick={() => {
-                  toggleExpand();
-                  setIsDeleteOpen(true);
-                }}
-                className="flex items-center cursor-pointer gap-2 px-3 py-2 hover:text-black text-white hover:bg-orange-400"
-              >
-                <Trash /> <span>Delete book</span>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-      <Dialog
-        open={isDeleteOpen}
-        onClose={() => setIsDeleteOpen(false)}
-        document={book}
-      />
-    </div>
+    <MenuContext.Provider value={{ isOpen, setIsOpen }}>
+      <div ref={divRef} className={`relative ${className ?? ""}`}>
+        {children}
+      </div>
+    </MenuContext.Provider>
+  );
+}
+
+type MenuButtonProps = {
+  children: ReactNode;
+  className?: string;
+};
+
+const MenuButton = ({ children, className }: MenuButtonProps) => {
+  const { isOpen, setIsOpen } = useMenuContext();
+  return (
+    <button
+      type="button"
+      className={`${className ?? ""}`}
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      {children}
+    </button>
   );
 };
 
-export default Menu;
+Menu.MenuButton = MenuButton;
+
+type MenuItemsProps = {
+  children: ReactNode;
+  className?: string;
+};
+
+const MenuItems = ({ children, className }: MenuItemsProps) => {
+  const { isOpen } = useMenuContext();
+  const ulRef = useRef<HTMLUListElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen && ulRef.current) {
+      const dropdownRight = ulRef.current.getBoundingClientRect();
+      window.innerWidth - dropdownRight.right <= 0
+        ? (ulRef.current.style.right = "0")
+        : (ulRef.current.style.left = "0");
+    }
+  }, [isOpen]);
+
+  return (
+    <>
+      {isOpen && (
+        <ul
+          ref={ulRef}
+          className={`bg-light-dark rounded-lg p-2 absolute top-[120%] w-[150px] z-10 ${
+            className ?? ""
+          }`}
+        >
+          {children}
+        </ul>
+      )}
+    </>
+  );
+};
+
+Menu.MenuItems = MenuItems;
+
+type MenuItemProps = {
+  children: ReactNode;
+  className?: string;
+  handleClick: () => void;
+};
+
+const MenuItem = ({ children, className, handleClick }: MenuItemProps) => {
+  const { setIsOpen } = useMenuContext();
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => {
+          handleClick();
+          setIsOpen(false);
+        }}
+        className={`hover:bg-light-gray text-start p-2 rounded-md w-full inline-flex items-center ${
+          className ?? ""
+        }`}
+      >
+        {children}
+      </button>
+    </li>
+  );
+};
+
+Menu.MenItem = MenuItem;
+
+type Icon = {
+  children: ReactNode;
+  className?: string;
+};
+
+const MenuIcon = ({ children, className }: Icon) => {
+  return <div className={`me-2 ${className ?? ""}`}>{children}</div>;
+};
+
+Menu.MenuIcon = MenuIcon;
+
+const useMenuContext = () => {
+  const context = useContext(MenuContext);
+
+  if (!context) {
+    throw new Error(
+      "the useMenuContext should be used within a Menu component"
+    );
+  }
+
+  return context;
+};

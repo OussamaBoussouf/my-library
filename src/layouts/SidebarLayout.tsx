@@ -1,9 +1,10 @@
+
 import Navbar from "../components/Navbar/Navbar";
-import Sidebar from "../components/Sidebar/Sidebar";
+
 import { Outlet } from "react-router-dom";
+import Sidebar from "../components/Sidebar/Sidebar";
 
-
-function Dashboard() {
+function SidebarLayout() {
   return (
     <div className="bg-[#101114]">
       <Navbar />
@@ -15,4 +16,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default SidebarLayout;

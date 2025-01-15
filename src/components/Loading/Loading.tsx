@@ -1,5 +1,3 @@
-
-
 function Loading() {
     return (
         <div className='bg-[#101114] sm:ml-[200px] md:ml-[250px] flex items-center justify-center h-screen w-screen'>
